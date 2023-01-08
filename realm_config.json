@@ -1,8 +1,0 @@
-{
-    "app_id": "artmed_api-gkxyf",
-    "config_version": 20210101,
-    "name": "artmed_api",
-    "location": "DE-FF",
-    "provider_region": "aws-eu-central-1",
-    "deployment_model": "LOCAL"
-}
