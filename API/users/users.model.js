@@ -8,7 +8,7 @@ const jwt = require("jsonwebtoken");
 
 const { UnauthorizedError } = require("../../helpers/error.helpers");
 
-const userSchema = new Schema({
+const authSchema = new Schema({
   // email: { type: String, required: true, unique: true },
   // password: { type: String, required: true },
   // token: { type: String, default: "" },
@@ -16,24 +16,20 @@ const userSchema = new Schema({
   // verificationToken: String,
   // resetPasswordToken: String,
   phone: { type: String, required: true, unique: true, sparse: true },
-  verificationCode: {
-    type: String,
-    required: true,
-    unique: true,
-  },
+  admin: { type: Boolean, required: true },
 });
 
-userSchema.statics.brcPassHash = brcPassHash;
-userSchema.statics.userByEmail = userByEmail;
-userSchema.methods.checkUser = checkUser;
-userSchema.methods.updateToken = updateToken;
-userSchema.statics.verifyToken = verifyToken;
-userSchema.methods.addProject = addProject;
-userSchema.methods.removeProjectId = removeProjectId;
-userSchema.statics.removeProjectFromParticipants = removeProjectFromParticipants;
-userSchema.methods.removeVerificationToken = removeVerificationToken;
-userSchema.statics.findByVerificationToken = findByVerificationToken;
-userSchema.statics.findByTokenAndUpdatePassword = findByTokenAndUpdatePassword;
+authSchema.statics.brcPassHash = brcPassHash;
+authSchema.statics.userByEmail = userByEmail;
+authSchema.methods.checkUser = checkUser;
+authSchema.methods.updateToken = updateToken;
+authSchema.statics.verifyToken = verifyToken;
+authSchema.methods.addProject = addProject;
+authSchema.methods.removeProjectId = removeProjectId;
+authSchema.statics.removeProjectFromParticipants = removeProjectFromParticipants;
+authSchema.methods.removeVerificationToken = removeVerificationToken;
+authSchema.statics.findByVerificationToken = findByVerificationToken;
+authSchema.statics.findByTokenAndUpdatePassword = findByTokenAndUpdatePassword;
 
 function brcPassHash(password) {
   return bcrypt.hash(password, 3);
@@ -60,7 +56,7 @@ async function checkUser(password) {
 }
 
 function updateToken(token) {
-  return userModel.findByIdAndUpdate(this._id, {
+  return authModel.findByIdAndUpdate(this._id, {
     token,
   });
 }
@@ -70,7 +66,7 @@ function verifyToken(token) {
 }
 
 function addProject(projectId) {
-  return userModel.findByIdAndUpdate(
+  return authModel.findByIdAndUpdate(
     this._id,
     {
       $push: { projectIds: projectId },
@@ -96,7 +92,7 @@ async function findByVerificationToken(verificationToken) {
 }
 
 async function removeVerificationToken() {
-  return userModel.findByIdAndUpdate(this._id, {
+  return authModel.findByIdAndUpdate(this._id, {
     verificationToken: null,
   });
 }
@@ -108,6 +104,6 @@ function findByTokenAndUpdatePassword(resetPasswordToken, newPassword) {
   return this.findOneAndUpdate({ resetPasswordToken }, toUpdate);
 }
 
-const userModel = mongoose.model("User", userSchema);
+const authModel = mongoose.model("Auth", authSchema);
 
-module.exports = userModel;
+module.exports = authModel;

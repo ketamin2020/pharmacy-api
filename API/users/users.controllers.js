@@ -1,9 +1,9 @@
-const userModel = require("./users.model");
+const authModel = require("./users.model");
 
 class UsersControllers {
   async getCurrentUser(req, res) {
     const { _id } = req.user;
-    const [user] = await userModel.aggregate([
+    const [user] = await authModel.aggregate([
       {
         $match: { _id },
       },
@@ -24,10 +24,10 @@ class UsersControllers {
         name: project.name,
         description: project.description,
         isOwner: project.owner.toString() === _id.toString(),
-      }
+      };
     });
 
-    const userToRespone = {email: user.email, projects};
+    const userToRespone = { email: user.email, projects };
 
     return res.status(200).send(userToRespone);
   }
