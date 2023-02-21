@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const { errorConverter, errorHandler } = require("./middlewares/error");
 const authRouter = require("./auth/auth.router");
 const usersRouter = require("./users/users.router");
+const uploadRouter = require("./common/upload/upload.router");
 const ApiError = require("../utils/ApiError");
 const helmet = require("helmet");
 const {
@@ -75,6 +76,7 @@ module.exports = class taskMgrServer {
     // input routers here
     this.server.use("/api/auth", authRouter);
     this.server.use("/api/users", usersRouter);
+    this.server.use("/api/upload", uploadRouter);
     console.log("Routes initialized");
   }
 
