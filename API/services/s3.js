@@ -13,7 +13,7 @@ const s3 = new S3({
 });
 
 // UPLOAD FILE TO S3
-function uploadFile(file) {
+function uploadToS3(file) {
   const fileStream = fs.createReadStream(file.path);
 
   const uploadParams = {
@@ -25,7 +25,7 @@ function uploadFile(file) {
   return s3.upload(uploadParams).promise();
 }
 
-module.exports = { uploadFile };
+module.exports = { uploadToS3 };
 
 // // DOWNLOAD FILE FROM S3
 // function getFileStream(fileKey) {

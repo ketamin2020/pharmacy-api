@@ -3,10 +3,12 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
+
 const { errorConverter, errorHandler } = require("./middlewares/error");
 const authRouter = require("./auth/auth.router");
 const usersRouter = require("./users/users.router");
-const uploadRouter = require("./common/upload/upload.router");
+const uploadRouter = require("./upload/upload.router");
+const brandsRouter = require("./brands/brands.router");
 const ApiError = require("../utils/ApiError");
 const helmet = require("helmet");
 const {
@@ -15,7 +17,7 @@ const {
   JoiValidationError,
   NotFoundError,
 } = require("../helpers/error.helpers");
-const httpStatus = require("http-status");
+
 module.exports = class taskMgrServer {
   constructor() {
     this.server = null;
@@ -77,6 +79,7 @@ module.exports = class taskMgrServer {
     this.server.use("/api/auth", authRouter);
     this.server.use("/api/users", usersRouter);
     this.server.use("/api/upload", uploadRouter);
+    this.server.use("/api/brands", brandsRouter);
     console.log("Routes initialized");
   }
 
