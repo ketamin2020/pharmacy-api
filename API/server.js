@@ -9,6 +9,7 @@ const authRouter = require("./auth/auth.router");
 const usersRouter = require("./users/users.router");
 const uploadRouter = require("./upload/upload.router");
 const brandsRouter = require("./brands/brands.router");
+const partnerRouter = require("./partners/partner.router");
 const ApiError = require("../utils/ApiError");
 const helmet = require("helmet");
 const {
@@ -80,6 +81,7 @@ module.exports = class taskMgrServer {
     this.server.use("/api/users", usersRouter);
     this.server.use("/api/upload", uploadRouter);
     this.server.use("/api/brands", brandsRouter);
+    this.server.use("/api/partners", partnerRouter);
     console.log("Routes initialized");
   }
 
