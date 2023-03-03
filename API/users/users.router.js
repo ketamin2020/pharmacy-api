@@ -1,15 +1,13 @@
 const { Router } = require("express");
 
-const autorization = require("../middlewares/authorization");
 const UsersControllers = require("./users.controllers");
 const asyncWrapper = require("../../utils/asyncWrapper");
 
 const userRouter = Router();
 
-userRouter.get(
-  "/current",
-  autorization,
-  asyncWrapper(UsersControllers.getCurrentUser)
-);
+userRouter.get("/get", asyncWrapper(UsersControllers.getCurrentUser));
+userRouter.post("/create", asyncWrapper(UsersControllers.getCurrentUser));
+userRouter.put("/update", asyncWrapper(UsersControllers.getCurrentUser));
+userRouter.delete("/delete", asyncWrapper(UsersControllers.getCurrentUser));
 
 module.exports = userRouter;
