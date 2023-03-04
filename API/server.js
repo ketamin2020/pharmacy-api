@@ -15,6 +15,7 @@ const workerRouter = require("./workers/worker.router");
 const makerRouter = require("./makers/makers.router");
 const substanceRouter = require("./substances/substances.router");
 const groupRouter = require("./groups/groups.router");
+const instructionRouter = require("./instructions/instructions.router");
 const ApiError = require("../utils/ApiError");
 const helmet = require("helmet");
 const {
@@ -92,6 +93,7 @@ module.exports = class taskMgrServer {
     this.server.use("/api/makers", makerRouter);
     this.server.use("/api/substances", substanceRouter);
     this.server.use("/api/groups", groupRouter);
+    this.server.use("/api/instructions", instructionRouter);
     console.log("Routes initialized");
   }
 
