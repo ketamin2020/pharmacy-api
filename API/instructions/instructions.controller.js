@@ -20,14 +20,30 @@ const postInstruction = async (req, res, next) => {
   await instruction.save();
   return res.status(200).send({ data: httpStatus[200] });
 };
-const putInstruction = (req, res, next) => {};
+const putInstruction = async (req, res, next) => {
+  const { id } = req.body;
+  if (!id)
+    return res
+      .status(404)
+      .send({ id: "id is required", message: httpStatus["404_MESSAGE"] });
+
+  await instructionsModel.findByIdAndUpdate(
+    { _id: id },
+    {
+      ...req.body,
+    }
+  );
+  return res
+    .status(200)
+    .send({ message: "Instruction was updated successfuly!" });
+};
 const deleteInstruction = async (req, res, next) => {
   const { id } = req.query;
   if (!id)
     return res
       .status(404)
       .send({ id: "id is required", message: httpStatus["404_MESSAGE"] });
-  await substancesModel.instructionsModel({ _id: id });
+  await instructionsModel.deleteOne({ _id: id });
   res.status(200).send({ message: "Substances was deleted successfuly!" });
 };
 

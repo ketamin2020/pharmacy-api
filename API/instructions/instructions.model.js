@@ -21,6 +21,10 @@ const instructionsSchema = new Schema(
 
         html: { type: String },
       },
+      medicinal_group: {
+        title: { type: String, default: "Фармакотерапевтична група" },
+        html: "",
+      },
       pharmacodynamics: {
         title: { type: String, default: "Фармакодинаміка" },
         html: { type: String },
