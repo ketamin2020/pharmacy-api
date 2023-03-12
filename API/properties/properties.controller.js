@@ -1,8 +1,13 @@
 const httpStatus = require("http-status");
 const propertiesModel = require("./properties.model");
-
+const mongoose = require("mongoose");
+const {
+  Schema,
+  Types: { ObjectId },
+} = mongoose;
 const getProperties = async (req, res, next) => {
   const allProperties = await propertiesModel.find({});
+
   const propertiesList = allProperties.reduce((list, property) => {
     list.push({
       id: property._id,
@@ -16,12 +21,25 @@ const getProperties = async (req, res, next) => {
   return res.status(200).send({ data: propertiesList });
 };
 const postProperty = async (req, res, next) => {
-  const instruction = new propertiesModel(req.body);
+  const { morion, external_code, name, main, warnings } = req.body;
+  const instruction = new propertiesModel({
+    morion,
+    external_code,
+    name,
+    attributes: {
+      main: {
+        items: main,
+      },
+      warnings: {
+        items: warnings,
+      },
+    },
+  });
   await instruction.save();
   return res.status(200).send({ data: httpStatus[200] });
 };
 const putProperty = async (req, res, next) => {
-  const { id } = req.body;
+  const { id, morion, external_code, name, main, warnings } = req.body;
   if (!id)
     return res
       .status(404)
@@ -30,7 +48,17 @@ const putProperty = async (req, res, next) => {
   await propertiesModel.findByIdAndUpdate(
     { _id: id },
     {
-      ...req.body,
+      morion,
+      external_code,
+      name,
+      attributes: {
+        main: {
+          items: main,
+        },
+        warnings: {
+          items: warnings,
+        },
+      },
     }
   );
   return res
