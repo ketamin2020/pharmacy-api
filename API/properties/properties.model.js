@@ -22,7 +22,7 @@ const propertiesSchema = new Schema(
           },
           marked_name: {
             title: { type: String, default: "Торгівельна назва" },
-            value: { type: String, default: "" },
+            value: { type: ObjectId, ref: "TradeName" },
           },
           manufacturing_country: {
             title: { type: String, default: "Країна виробник" },

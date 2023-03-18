@@ -1,4 +1,4 @@
-const authModel = require("../../API/users/users.model");
+const authModel = require("./auth.model");
 const jwt = require("jsonwebtoken");
 const httpStatus = require("http-status");
 
@@ -56,16 +56,15 @@ async function userLogin(req, res) {
 // }
 
 async function userLogout(req, res) {
-  const user = req.user;
-  if (!user) {
-    return res.status(400).json({ message: "Not found" });
-  }
-  const userToBeLoguot = await user.updateToken("");
-  if (!userToBeLoguot) {
-    return res.status(400).json({ message: "Not found" });
-  }
-
-  return res.status(204).end();
+  // const user = req.user;
+  // if (!user) {
+  //   return res.status(400).json({ message: "Not found" });
+  // }
+  // const userToBeLoguot = await user.updateToken("");
+  // if (!userToBeLoguot) {
+  //   return res.status(400).json({ message: "Not found" });
+  // }
+  // return res.status(204).end();
 }
 
 module.exports = {
