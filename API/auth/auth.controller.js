@@ -5,7 +5,6 @@ const httpStatus = require("http-status");
 async function userLogin(req, res) {
   const { phone } = req.body;
   const user = await authModel.findOne({ phone });
-
   const token = jwt.sign({ id: phone }, process.env.JWT_SECRET, {
     expiresIn: 30 * 24 * 60 * 60,
   });
@@ -15,6 +14,7 @@ async function userLogin(req, res) {
       message: httpStatus.CREATED,
       token,
       admin: user.admin,
+      id: user._id,
     });
   }
 
@@ -29,6 +29,7 @@ async function userLogin(req, res) {
     token,
     message: httpStatus.CREATED,
     admin: auth.admin,
+    id: auth._id,
   });
 }
 

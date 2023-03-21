@@ -1,5 +1,7 @@
 const workerModel = require("./worker.model");
-const slugify = require("slugify");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const httpStatus = require("http-status");
 const getWorkers = async (req, res, next) => {
   const allWorkers = await workerModel.find({});
 
@@ -18,15 +20,16 @@ const getWorkers = async (req, res, next) => {
   return res.status(200).send({ data: workersList });
 };
 const postWorker = async (req, res, next) => {
-  const { first_name } = req.body;
-  // const slug = slugify(first_name, {
-  //   replacement: "-", // replace spaces with replacement character, defaults to `-`
-  //   lower: true, // convert to lower case, defaults to `false`
-  // });
+  const { password } = req.body;
+  if (!password)
+    return res
+      .status(404)
+      .send({ id: "password is required", message: httpStatus["404_MESSAGE"] });
 
-  const worker = new workerModel({ ...req.body });
-  const newBrand = await worker.save();
-  return res.status(200).send({ data: newBrand });
+  const hashPassword = await bcrypt.hash(password, 3);
+  const worker = new workerModel({ ...req.body, password: hashPassword });
+  const newWorker = await worker.save();
+  return res.status(200).send({ data: newWorker });
 };
 const putWorker = (req, res, next) => {};
 const deleteWorker = async (req, res, next) => {
@@ -36,7 +39,41 @@ const deleteWorker = async (req, res, next) => {
       .status(404)
       .send({ id: "id is required", message: httpStatus["404_MESSAGE"] });
   await workerModel.deleteOne({ _id: id });
-  res.status(200).send({ message: "Partner was deleted successfuly!" });
+  res.status(200).send({ message: "Workers was deleted successfuly!" });
 };
 
-module.exports = { getWorkers, postWorker, putWorker, deleteWorker };
+const loginWorker = async (req, res, next) => {
+  const { email, password, phone } = req.body;
+  const worker = await workerModel.findOne({ phone });
+  if (!worker)
+    return res.status(401).json({
+      message: httpStatus.UNAUTHORIZED,
+    });
+  const token = jwt.sign({ id: phone }, process.env.JWT_SECRET, {
+    expiresIn: 30 * 24 * 60 * 60,
+  });
+
+  if (worker) {
+    const isPassValid = await bcrypt.compare(password, worker.password);
+
+    if (isPassValid) {
+      return res.status(201).json({
+        token,
+        id: worker._id,
+        role: worker.position,
+      });
+    } else {
+      return res.status(401).json({
+        message: httpStatus.UNAUTHORIZED,
+      });
+    }
+  }
+};
+
+module.exports = {
+  getWorkers,
+  postWorker,
+  putWorker,
+  deleteWorker,
+  loginWorker,
+};

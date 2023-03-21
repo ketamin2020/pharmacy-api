@@ -10,6 +10,20 @@ const getGroups = async (req, res, next) => {
   const groups = allGroups.reduce((list, group) => {
     list.push({
       id: group._id,
+      slug: group.slug,
+      group_name: group.group_name,
+      children: group.children,
+    });
+    return list;
+  }, []);
+  return res.status(200).send({ data: groups });
+};
+const getGroupsPublic = async (req, res, next) => {
+  const allGroups = await groupsModel.find({});
+  const groups = allGroups.reduce((list, group) => {
+    list.push({
+      id: group._id,
+      slug: group.slug,
       group_name: group.group_name,
       children: group.children,
     });
@@ -50,13 +64,14 @@ const postGroup = async (req, res, next) => {
       { _id: parent_id },
       {
         $push: {
-          "children.$[].children": {
+          "children.$[elem].children": {
             ...req.body,
             slug,
             id: ObjectId().toHexString(),
           },
         },
-      }
+      },
+      { arrayFilters: [{ "elem.id": req.body.child_id }] }
     );
 
     return res.status(200).send({ message: httpStatus[200] });
@@ -145,4 +160,10 @@ const deleteGroup = async (req, res, next) => {
   }
 };
 
-module.exports = { getGroups, postGroup, putGroup, deleteGroup };
+module.exports = {
+  getGroups,
+  postGroup,
+  putGroup,
+  deleteGroup,
+  getGroupsPublic,
+};
