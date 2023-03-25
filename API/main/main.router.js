@@ -1,13 +1,12 @@
 const { Router } = require("express");
 
-const ImagesControllers = require("./images.controller");
+const mainControllers = require("./main.controller");
 const asyncWrapper = require("../../utils/asyncWrapper");
 
-const imagesRouter = Router();
+const mainRouter = Router();
 
-imagesRouter.get("/get", asyncWrapper(ImagesControllers.getImages));
-imagesRouter.post("/create", asyncWrapper(ImagesControllers.postImages));
-imagesRouter.put("/update", asyncWrapper(ImagesControllers.putImages));
-imagesRouter.delete("/delete", asyncWrapper(ImagesControllers.deleteImages));
+mainRouter.get("/get", asyncWrapper(mainControllers.getMain));
+mainRouter.post("/create", asyncWrapper(mainControllers.postMain));
+mainRouter.put("/update", asyncWrapper(mainControllers.putMain));
 
-module.exports = imagesRouter;
+module.exports = mainRouter;

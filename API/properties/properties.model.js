@@ -38,11 +38,11 @@ const propertiesSchema = new Schema(
           },
           dosage: {
             title: { type: String, default: "Дозування" },
-            value: { type: String, default: "" },
+            value: { type: ObjectId, ref: "Dosage" },
           },
           production_form: {
             title: { type: String, default: "Форма" },
-            value: { type: String, default: "" },
+            value: { type: ObjectId, ref: "Form" },
           },
           prescription: {
             title: { type: String, default: "Без рецепта" },
@@ -54,11 +54,11 @@ const propertiesSchema = new Schema(
           },
           administration_route: {
             title: { type: String, default: "Спосіб введення" },
-            value: { type: String, default: "" },
+            value: { type: ObjectId, ref: "AdministrationRoute" },
           },
           quantity: {
             title: { type: String, default: "Кількість в упаковці" },
-            value: { type: String, default: "" },
+            value: { type: ObjectId, ref: "Quantity" },
           },
 
           expiration: {
@@ -71,12 +71,12 @@ const propertiesSchema = new Schema(
           },
           storage_temperature: {
             title: { type: String, default: "Температура зберігання" },
-            value: { type: String, default: "" },
+            value: { type: ObjectId, ref: "Temperature" },
           },
 
           package: {
             title: { type: String, default: "Упаковка" },
-            value: { type: String, default: "" },
+            value: { type: ObjectId, ref: "Package" },
           },
         },
       },

@@ -19,6 +19,14 @@ const instructionRouter = require("./instructions/instructions.router");
 const propertyRouter = require("./properties/properties.router");
 const tradeNameRouter = require("./tradeName/tradeName.router");
 const imagesRouter = require("./images/images.router");
+const mainRouter = require("./main/main.router");
+const bannerRouter = require("./banner/banner.router");
+const formRouter = require("./form/form.router");
+const administrationRouteRouter = require("./administrationRoute/administration_route.router");
+const quantityRouter = require("./quantity/quantity.router");
+const temperaturesRouter = require("./temperature/temperature.router");
+const packagesRouter = require("./package/package.router");
+const dosageRouter = require("./dosage/dosage.router");
 const ApiError = require("../utils/ApiError");
 const helmet = require("helmet");
 const {
@@ -100,6 +108,15 @@ module.exports = class taskMgrServer {
     this.server.use("/api/properties", propertyRouter);
     this.server.use("/api/trade-name", tradeNameRouter);
     this.server.use("/api/images", imagesRouter);
+    this.server.use("/api/main", mainRouter);
+    this.server.use("/api/banner", bannerRouter);
+    this.server.use("/api/form", formRouter);
+    this.server.use("/api/route", administrationRouteRouter);
+    this.server.use("/api/quantity", quantityRouter);
+    this.server.use("/api/temperature", temperaturesRouter);
+    this.server.use("/api/package", packagesRouter);
+    this.server.use("/api/dosage", dosageRouter);
+
     console.log("Routes initialized");
   }
 
