@@ -28,6 +28,20 @@ const propertiesSchema = new Schema(
             title: { type: String, default: "Країна виробник" },
             value: { type: String, default: "" },
           },
+          groups: {
+            main_group: {
+              value: { type: ObjectId, ref: "Groups" },
+              slug: { type: String, required: true },
+            },
+            first_lavel_group: {
+              value: { type: String, required: true },
+              slug: { type: String, required: true },
+            },
+            second_lavel_group: {
+              value: { type: String, required: true },
+              slug: { type: String, required: true },
+            },
+          },
           maker: {
             title: { type: String, default: "Виробник" },
             value: { type: ObjectId, ref: "Makers" },

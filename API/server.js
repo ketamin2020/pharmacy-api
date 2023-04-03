@@ -27,6 +27,8 @@ const quantityRouter = require("./quantity/quantity.router");
 const temperaturesRouter = require("./temperature/temperature.router");
 const packagesRouter = require("./package/package.router");
 const dosageRouter = require("./dosage/dosage.router");
+const priceRouter = require("./price/price.router");
+const publicRouter = require("./public/public.router");
 const ApiError = require("../utils/ApiError");
 const helmet = require("helmet");
 const {
@@ -116,6 +118,8 @@ module.exports = class taskMgrServer {
     this.server.use("/api/temperature", temperaturesRouter);
     this.server.use("/api/package", packagesRouter);
     this.server.use("/api/dosage", dosageRouter);
+    this.server.use("/api/price", priceRouter);
+    this.server.use("/api/drugs", publicRouter);
 
     console.log("Routes initialized");
   }
