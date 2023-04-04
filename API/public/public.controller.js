@@ -1,5 +1,5 @@
 const propertyModel = require("../properties/properties.model");
-
+const groupsModel = require("../groups/groups.model");
 const getDrugsList = async (req, res, next) => {
   const { main_group, first_lavel, second_level } = req.query;
 
@@ -16,6 +16,18 @@ const getDrugsList = async (req, res, next) => {
     filters[
       "attributes.main.items.groups.second_lavel_group.slug"
     ] = second_level;
+  }
+
+  if (main_group && !first_lavel && !second_level) {
+    const children = await groupsModel.find({ slug: main_group });
+
+    const data = children.map((group) => ({
+      group_name: group.group_name,
+      slug: group.slug,
+      children: group.children,
+    }));
+
+    return res.status(200).send({ data });
   }
 
   const pipeline = [
@@ -357,6 +369,22 @@ const getDrugsList = async (req, res, next) => {
       },
     },
   ];
+  const pipelineImported = [
+    { $unwind: "$attributes.main.items" },
+    {
+      $group: {
+        _id: { importedValue: "$attributes.main.items.imported.value" },
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        name: "$_id.importedValue",
+        count: 1,
+      },
+    },
+  ];
   const data = await propertyModel.aggregate(pipeline).exec();
   const trade_name = await propertyModel.aggregate(pipelineTradeName).exec();
   const makers = await propertyModel.aggregate(pipelineMakers).exec();
@@ -368,6 +396,7 @@ const getDrugsList = async (req, res, next) => {
   const temperature = await propertyModel.aggregate(pipelineTemperature).exec();
   const packages = await propertyModel.aggregate(pipelinePackages).exec();
   const warnings = await propertyModel.aggregate(pipelineWarnings);
+  const imported = await propertyModel.aggregate(pipelineImported);
 
   return res.status(200).send({
     data,
@@ -382,6 +411,7 @@ const getDrugsList = async (req, res, next) => {
       temperature,
       packages,
       warnings,
+      imported,
     },
   });
 };
