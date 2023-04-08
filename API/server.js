@@ -31,6 +31,7 @@ const priceRouter = require("./price/price.router");
 const publicRouter = require("./public/public.router");
 const ApiError = require("../utils/ApiError");
 const helmet = require("helmet");
+const bodyParser = require("body-parser");
 const {
   ConflictError,
   UnauthorizedError,
@@ -66,7 +67,7 @@ module.exports = class taskMgrServer {
   }
 
   initMiddlwares() {
-    this.server.use(express.json());
+    this.server.use(express.json({ charset: "utf-8" }));
     this.server.use(
       // cors({ origin: `${process.env.BASE_URL}/` })
       cors({})
@@ -75,6 +76,15 @@ module.exports = class taskMgrServer {
     this.server.use(errorConverter);
     this.server.use(errorHandler);
     this.server.use(morgan("dev"));
+    this.server.use(bodyParser.urlencoded({ extended: true }));
+    this.server.use(
+      bodyParser.json({
+        limit: "50mb",
+        type: "application/json",
+        extended: true,
+        parameterLimit: 50000,
+      })
+    );
 
     console.log("middlewares initialized");
   }
@@ -131,6 +141,14 @@ module.exports = class taskMgrServer {
         useUnifiedTopology: true,
         useCreateIndex: true,
         useFindAndModify: false,
+        config: {
+          autoIndex: false,
+          useNewUrlParser: true,
+          useUnifiedTopology: true,
+          useCreateIndex: true,
+          useFindAndModify: false,
+          charset: "utf8",
+        },
       });
       console.log("Database connection successful");
     } catch (err) {

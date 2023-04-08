@@ -436,6 +436,10 @@ const getDrugById = async (req, res, next) => {
       path: "attributes.main.items.maker.value",
       model: "Makers",
     })
+    .populate({
+      path: "attributes.main.items.storage_temperature.value",
+      model: "Temperature",
+    })
     .select("attributes external_code morion name _id updatedAt ");
 
   const price = await priceModel
