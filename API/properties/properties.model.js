@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const slug = require("mongoose-slug-generator");
 mongoose.plugin(slug);
+
 const {
   Schema,
   Types: { ObjectId },
@@ -10,7 +11,7 @@ const propertiesSchema = new Schema(
   {
     morion: { type: Number, required: true, unique: true },
     external_code: { type: String, required: false },
-    name: { type: String, required: true, default: "Властивості препарату" },
+    name: { type: String, required: true, default: "Торгова назва" },
     attributes: {
       main: {
         id: { type: ObjectId, default: ObjectId() },

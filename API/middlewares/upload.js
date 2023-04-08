@@ -6,7 +6,7 @@ const unlinkFile = util.promisify(fs.unlink);
 const httpStatus = require("http-status");
 const message = "The file is requred!";
 const upload = async (req, res, next) => {
-  if (!req?.file)
+  if (!req || !req.file)
     return res
       .status(404)
       .json({ file: message, error: httpStatus["404_MESSAGE"] });

@@ -1,5 +1,8 @@
 const propertyModel = require("../properties/properties.model");
 const groupsModel = require("../groups/groups.model");
+const priceModel = require("../price/price.model");
+const instructionModel = require("../instructions/instructions.model");
+const imagesModel = require("../images/images.model");
 const getDrugsList = async (req, res, next) => {
   const { main_group, first_lavel, second_level } = req.query;
 
@@ -74,10 +77,12 @@ const getDrugsList = async (req, res, next) => {
       $project: {
         morion: "$morion",
         name: "$name",
+        slug: "$slug",
         price: "$price",
         images: "$images",
         marked_name: "$marked_name",
         id: "$_id",
+        external_code: "$external_code",
       },
     },
   ];
@@ -416,45 +421,38 @@ const getDrugsList = async (req, res, next) => {
   });
 };
 
-module.exports = { getDrugsList };
+const getDrugById = async (req, res, next) => {
+  const property = await propertyModel
+    .findOne({ id: req.body.id })
+    .populate({
+      path: "attributes.main.items.active_ingredient.value",
+      model: "Substance",
+    })
+    .populate({
+      path: "attributes.main.items.marked_name.value",
+      model: "TradeName",
+    })
+    .populate({
+      path: "attributes.main.items.maker.value",
+      model: "Makers",
+    })
+    .select("attributes external_code morion name _id updatedAt ");
 
-//AS VARIANT
-// const pipelineSearch = [
-//   {
-//     $group: {
-//       _id: "$attributes.main.items.marked_name.value",
-//       count: { $sum: 1 },
-//       title: { $first: "$items.name" },
-//     },
-//   },
-//   { $sort: { count: -1 } },
+  const price = await priceModel
+    .findOne({ morion: property.morion })
+    .populate("partner");
+  const instruction = await instructionModel.findOne({
+    morion: property.morion,
+  });
+  const images = await imagesModel.findOne({
+    morion: property.morion,
+  });
+  return res.status(200).send({
+    property,
+    price,
+    instruction,
+    images,
+  });
+};
 
-//   {
-//     $group: {
-//       _id: null,
-//       items: { $push: "$_id" },
-//       values: {
-//         $push: {
-//           title: "$item.name",
-//           value: "$_id",
-//           count: "$count",
-//         },
-//       },
-//     },
-//   },
-//   {
-//     $project: {
-//       _id: 0,
-//       items: 1,
-//       values: 1,
-//     },
-//   },
-//   {
-//     $lookup: {
-//       from: "tradenames",
-//       localField: "items",
-//       foreignField: "_id",
-//       as: "items",
-//     },
-//   },
-// ];
+module.exports = { getDrugsList, getDrugById };

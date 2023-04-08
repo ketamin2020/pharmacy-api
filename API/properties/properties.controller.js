@@ -1,6 +1,7 @@
 const httpStatus = require("http-status");
 const propertiesModel = require("./properties.model");
 const mongoose = require("mongoose");
+const slugify = require("slugify");
 const {
   Schema,
   Types: { ObjectId },
@@ -15,6 +16,7 @@ const getProperties = async (req, res, next) => {
       attributes: property.attributes,
       morion: property.morion,
       external_code: property.external_code,
+      slug: property.slug,
     });
     return list;
   }, []);

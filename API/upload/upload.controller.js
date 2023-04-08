@@ -5,7 +5,7 @@ const { uploadToS3 } = require("../services/s3");
 const uploadModel = require("./upload.model");
 const httpStatus = require("http-status");
 const uploadFile = async (req, res, next) => {
-  if (!req?.file)
+  if (!req || !req.file)
     return res
       .status(404)
       .json({ file: message, error: httpStatus["404_MESSAGE"] });
