@@ -48,7 +48,7 @@ const propertiesSchema = new Schema(
             value: { type: ObjectId, ref: "Makers" },
           },
           imported: {
-            title: { type: String, default: "Ні" },
+            title: { type: String, default: "Імпорт" },
             value: { type: String, default: "" },
           },
           dosage: {
@@ -60,7 +60,7 @@ const propertiesSchema = new Schema(
             value: { type: ObjectId, ref: "Form" },
           },
           prescription: {
-            title: { type: String, default: "Без рецепта" },
+            title: { type: String, default: "Рецептурний відпуск" },
             value: { type: String, default: "" },
           },
           morion: {

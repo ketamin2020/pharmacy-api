@@ -89,6 +89,9 @@ const getDrugsList = async (req, res, next) => {
 
   const pipelineTradeName = [
     {
+      $match: filters,
+    },
+    {
       $group: {
         _id: "$attributes.main.items.marked_name.value",
         count: { $sum: 1 },
@@ -117,6 +120,9 @@ const getDrugsList = async (req, res, next) => {
     },
   ];
   const pipelineSubstance = [
+    {
+      $match: filters,
+    },
     {
       $group: {
         _id: "$attributes.main.items.active_ingredient.value",
@@ -147,6 +153,9 @@ const getDrugsList = async (req, res, next) => {
   ];
   const pipelineMakers = [
     {
+      $match: filters,
+    },
+    {
       $group: {
         _id: "$attributes.main.items.maker.value",
         count: { $sum: 1 },
@@ -175,6 +184,9 @@ const getDrugsList = async (req, res, next) => {
     },
   ];
   const pipelineDosage = [
+    {
+      $match: filters,
+    },
     {
       $group: {
         _id: "$attributes.main.items.dosage.value",
@@ -205,6 +217,9 @@ const getDrugsList = async (req, res, next) => {
   ];
   const pipelineForms = [
     {
+      $match: filters,
+    },
+    {
       $group: {
         _id: "$attributes.main.items.production_form.value",
         count: { $sum: 1 },
@@ -233,6 +248,9 @@ const getDrugsList = async (req, res, next) => {
     },
   ];
   const pipelineRoute = [
+    {
+      $match: filters,
+    },
     {
       $group: {
         _id: "$attributes.main.items.administration_route.value",
@@ -263,6 +281,9 @@ const getDrugsList = async (req, res, next) => {
   ];
   const pipelineQty = [
     {
+      $match: filters,
+    },
+    {
       $group: {
         _id: "$attributes.main.items.quantity.value",
         count: { $sum: 1 },
@@ -292,6 +313,9 @@ const getDrugsList = async (req, res, next) => {
   ];
   const pipelineTemperature = [
     {
+      $match: filters,
+    },
+    {
       $group: {
         _id: "$attributes.main.items.storage_temperature.value",
         count: { $sum: 1 },
@@ -320,6 +344,9 @@ const getDrugsList = async (req, res, next) => {
     },
   ];
   const pipelinePackages = [
+    {
+      $match: filters,
+    },
     {
       $group: {
         _id: "$attributes.main.items.package.value",
@@ -351,6 +378,9 @@ const getDrugsList = async (req, res, next) => {
 
   const pipelineWarnings = [
     {
+      $match: filters,
+    },
+    {
       $project: {
         warnings: { $objectToArray: "$attributes.warnings.items" },
       },
@@ -375,6 +405,9 @@ const getDrugsList = async (req, res, next) => {
     },
   ];
   const pipelineImported = [
+    {
+      $match: filters,
+    },
     { $unwind: "$attributes.main.items" },
     {
       $group: {
@@ -440,22 +473,58 @@ const getDrugById = async (req, res, next) => {
       path: "attributes.main.items.storage_temperature.value",
       model: "Temperature",
     })
+    .populate({
+      path: "attributes.main.items.dosage.value",
+      model: "Dosage",
+    })
+    .populate({
+      path: "attributes.main.items.quantity.value",
+      model: "Quantity",
+    })
+    .populate({
+      path: "attributes.main.items.package.value",
+      model: "Package",
+    })
+    .populate({
+      path: "attributes.main.items.administration_route.value",
+      model: "AdministrationRoute",
+    })
+    .populate({
+      path: "attributes.main.items.production_form.value",
+      model: "Form",
+    })
     .select("attributes external_code morion name _id updatedAt ");
 
   const price = await priceModel
     .findOne({ morion: property.morion })
-    .populate("partner");
-  const instruction = await instructionModel.findOne({
-    morion: property.morion,
-  });
-  const images = await imagesModel.findOne({
-    morion: property.morion,
-  });
+    .populate("partner")
+    .select("current morion partner code previous_price");
+  const instruction = await instructionModel
+    .findOne({
+      morion: property.morion,
+    })
+    .select("name section -_id");
+
+  const images = await imagesModel
+    .findOne({
+      morion: property.morion,
+    })
+    .select("items ");
+
+  const prepareImages = images.items.filter((item) => !!item.id);
+
   return res.status(200).send({
-    property,
+    property: {
+      main: property.attributes.main,
+      warnings: property.attributes.warnings,
+    },
     price,
     instruction,
-    images,
+    images: prepareImages,
+    partner: price.partner,
+    morion: property.morion,
+    name: property.name,
+    external_code: property.external_code,
   });
 };
 
