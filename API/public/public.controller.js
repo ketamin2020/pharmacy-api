@@ -455,8 +455,9 @@ const getDrugsList = async (req, res, next) => {
 };
 
 const getDrugById = async (req, res, next) => {
+  if (!req.query.id) return;
   const property = await propertyModel
-    .findOne({ id: req.body.id })
+    .findOne({ _id: req.query.id })
     .populate({
       path: "attributes.main.items.active_ingredient.value",
       model: "Substance",

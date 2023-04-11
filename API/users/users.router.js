@@ -1,13 +1,16 @@
 const { Router } = require("express");
-
-const UsersControllers = require("./users.controllers");
+const authHiddleware = require("../middlewares/authorization");
+const userControllers = require("./users.controller");
 const asyncWrapper = require("../../utils/asyncWrapper");
 
 const userRouter = Router();
 
-userRouter.get("/get", asyncWrapper(UsersControllers.getCurrentUser));
-userRouter.post("/create", asyncWrapper(UsersControllers.getCurrentUser));
-userRouter.put("/update", asyncWrapper(UsersControllers.getCurrentUser));
-userRouter.delete("/delete", asyncWrapper(UsersControllers.getCurrentUser));
+userRouter.get(
+  "/get",
+  asyncWrapper(authHiddleware.withAuth),
+  asyncWrapper(userControllers.getUser)
+);
+userRouter.put("/update", asyncWrapper(userControllers.putUser));
+userRouter.delete("/delete", asyncWrapper(userControllers.deleteUser));
 
 module.exports = userRouter;

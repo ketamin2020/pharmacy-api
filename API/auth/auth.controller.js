@@ -1,35 +1,35 @@
-const authModel = require("./auth.model");
+const userModel = require("../users/users.model");
 const jwt = require("jsonwebtoken");
-const httpStatus = require("http-status");
 
 async function userLogin(req, res) {
   const { phone } = req.body;
-  const user = await authModel.findOne({ phone });
-  const token = jwt.sign({ id: phone }, process.env.JWT_SECRET, {
-    expiresIn: 30 * 24 * 60 * 60,
-  });
+  const user = await userModel.findOne({ phone });
 
   if (user) {
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: 30 * 24 * 60 * 60,
+    });
     return res.status(201).json({
-      message: httpStatus.CREATED,
       token,
-      admin: user.admin,
+      admin: false,
       id: user._id,
     });
   }
 
-  const auth = new authModel({
+  const newUser = new userModel({
     phone,
-    admin: false,
   });
 
-  await auth.save();
+  await newUser.save();
+
+  const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
+    expiresIn: 30 * 24 * 60 * 60,
+  });
 
   return res.status(201).json({
     token,
-    message: httpStatus.CREATED,
-    admin: auth.admin,
-    id: auth._id,
+    admin: false,
+    id: newUser._id,
   });
 }
 

@@ -1,16 +1,23 @@
 const mongoose = require("mongoose");
-const {
-  Schema,
-  Types: { ObjectId },
-} = mongoose;
+const { Schema } = mongoose;
+const userSchema = new Schema(
+  {
+    first_name: { type: String, required: false, default: "" },
+    last_name: { type: String, required: false, default: "" },
+    middle_name: { type: String, required: false, default: "" },
+    about: { type: String, required: false, default: "" },
+    phone: { type: String, required: true, unique: true },
+    password: { type: String, required: false, default: "" },
+    avatar: { type: Object, required: false, default: {} },
+    wishlist: { type: Array, required: false, default: [] },
+    review: { type: Array, required: false, default: [] },
+    orders: { type: Array, required: false, default: [] },
+    basket: { type: Array, required: false, default: [] },
+    bonus: { type: Array, required: false, default: [] },
+  },
+  { timestamps: true }
+);
 
-const usersSchema = new Schema({
-  login: { type: String, required: false, unique: true },
-  password: { type: String, required: false, unique: true },
-  phone: { type: String, required: true, unique: true, sparse: true },
-  admin: { type: Boolean, required: true, default: false },
-});
+const userModel = mongoose.model("Users", userSchema);
 
-const usersModel = mongoose.model("Users", usersSchema);
-
-module.exports = usersModel;
+module.exports = userModel;

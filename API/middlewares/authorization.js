@@ -1,13 +1,16 @@
 const jwt = require("jsonwebtoken");
-const authModel = require("../users/users.model");
+const userModel = require("../users/users.model");
 const { UnauthorizedError } = require("../../helpers/error.helpers");
 
-module.exports = async (req, res, next) => {
+const withAuth = async (req, res, next) => {
   try {
     const header = req.headers["authorization"];
+
     const [_, token] = header.split(" ");
+
     const userId = jwt.verify(token, process.env.JWT_SECRET).id;
-    const user = await authModel.findById(userId);
+
+    const user = await userModel.findById(userId);
 
     if (!user) {
       throw new Error();
@@ -20,3 +23,5 @@ module.exports = async (req, res, next) => {
 
   next();
 };
+
+module.exports = { withAuth };
