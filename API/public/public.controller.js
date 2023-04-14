@@ -3,6 +3,7 @@ const groupsModel = require("../groups/groups.model");
 const priceModel = require("../price/price.model");
 const instructionModel = require("../instructions/instructions.model");
 const imagesModel = require("../images/images.model");
+const reviewModel = require("../reviews/reviews.model");
 const getDrugsList = async (req, res, next) => {
   const { main_group, first_lavel, second_level } = req.query;
 
@@ -512,10 +513,18 @@ const getDrugById = async (req, res, next) => {
     })
     .select("items ");
 
+  const reviews = await reviewModel
+    .find({
+      property: req.query.id,
+    })
+    .select("rate");
+  const rating = reviews.reduce((acc, item) => (acc += +item.rate), 0);
+
   const prepareImages = images.items.filter((item) => !!item.id);
 
   return res.status(200).send({
     property: {
+      id: req.query.id,
       main: property.attributes.main,
       warnings: property.attributes.warnings,
     },
@@ -526,6 +535,10 @@ const getDrugById = async (req, res, next) => {
     morion: property.morion,
     name: property.name,
     external_code: property.external_code,
+    reviews: {
+      count: reviews.length,
+      rating: (rating / reviews.length).toFixed(1),
+    },
   });
 };
 

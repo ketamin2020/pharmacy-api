@@ -1,5 +1,6 @@
 const httpStatus = require("http-status");
 const usersModel = require("./users.model");
+const jwt = require("jsonwebtoken");
 const getUser = async (req, res, next) => {
   const user = await usersModel
     .findById(req.user._id)
@@ -31,9 +32,19 @@ const deleteUser = async (req, res, next) => {
   await workerModel.deleteOne({ _id: id });
   res.status(200).send({ message: "Workers was deleted successfuly!" });
 };
+const getUserByToken = async (req, res, next) => {
+  const userId = jwt.verify(req.query.token, process.env.JWT_SECRET).id;
+
+  const user = await usersModel.findById(userId).lean();
+  if (!user) return res.status(404).send({ data: "User not found" });
+  user.id = user._id;
+  delete user._id;
+  return res.status(200).send({ data: user });
+};
 
 module.exports = {
   getUser,
   putUser,
   deleteUser,
+  getUserByToken,
 };

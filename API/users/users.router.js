@@ -10,6 +10,11 @@ userRouter.get(
   asyncWrapper(authHiddleware.withAuth),
   asyncWrapper(userControllers.getUser)
 );
+userRouter.get(
+  "/get-by-token",
+
+  asyncWrapper(userControllers.getUserByToken)
+);
 userRouter.put("/update", asyncWrapper(userControllers.putUser));
 userRouter.delete("/delete", asyncWrapper(userControllers.deleteUser));
 
