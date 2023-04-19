@@ -1,4 +1,5 @@
 const userModel = require("../users/users.model");
+const wishModel = require("../wish/wish.model");
 const jwt = require("jsonwebtoken");
 
 async function userLogin(req, res) {
@@ -20,6 +21,13 @@ async function userLogin(req, res) {
     phone,
   });
 
+  const newWish = new wishModel({
+    user_id: newUser._id,
+    products: [],
+  });
+
+  newUser.wishlist = newWish;
+  await newWish.save();
   await newUser.save();
 
   const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {

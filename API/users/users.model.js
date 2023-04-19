@@ -1,5 +1,9 @@
 const mongoose = require("mongoose");
-const { Schema } = mongoose;
+const {
+  Schema,
+  Types: { ObjectId },
+} = mongoose;
+
 const userSchema = new Schema(
   {
     first_name: { type: String, required: false, default: "" },
@@ -10,7 +14,7 @@ const userSchema = new Schema(
     password: { type: String, required: false, default: "" },
     email: { type: String, required: false, default: "" },
     avatar: { type: Object, required: false, default: {} },
-    wishlist: { type: Array, required: false, default: [] },
+    wishlist: { type: ObjectId, ref: "Wish", default: "" },
     reviews: { type: Array, required: false, default: [] },
     orders: { type: Array, required: false, default: [] },
     basket: { type: Array, required: false, default: [] },

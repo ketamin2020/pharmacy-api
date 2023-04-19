@@ -10,6 +10,11 @@ reviewRouter.get(
   "/reviews-list",
   asyncWrapper(reviewsControllers.getReviewsByPropertyId)
 );
+
+reviewRouter.get(
+  "/last-reviews",
+  asyncWrapper(reviewsControllers.getLastReviews)
+);
 reviewRouter.post(
   "/create",
   asyncWrapper(authHiddleware.withAuth),

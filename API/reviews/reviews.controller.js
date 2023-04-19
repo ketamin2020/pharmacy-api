@@ -14,6 +14,79 @@ const getReviews = async (req, res, next) => {
   // return res.status(200).send({ data: arr });
 };
 
+const getLastReviews = async (req, res, next) => {
+  const reviews = await reviewModel.aggregate([
+    { $sort: { createdAt: -1 } },
+    {
+      $group: {
+        _id: { author: "$author", property: "$property" },
+        review: { $first: "$$ROOT" },
+      },
+    },
+    { $replaceRoot: { newRoot: "$review" } },
+    {
+      $lookup: {
+        from: "users",
+        localField: "author",
+        foreignField: "_id",
+        as: "author",
+      },
+    },
+    {
+      $lookup: {
+        from: "properties",
+        localField: "property",
+        foreignField: "_id",
+        as: "property",
+      },
+    },
+    { $unwind: "$author" },
+    { $unwind: "$property" },
+    {
+      $lookup: {
+        from: "images",
+        let: { morion: "$property.morion" },
+        pipeline: [
+          { $match: { $expr: { $eq: ["$morion", "$$morion"] } } },
+          { $sort: { createdAt: -1 } },
+          { $limit: 5 },
+        ],
+        as: "property.images",
+      },
+    },
+    { $unwind: "$property.images" },
+    { $group: { _id: "$property.morion", data: { $first: "$$ROOT" } } },
+    { $replaceRoot: { newRoot: "$data" } },
+    { $limit: 20 },
+  ]);
+
+  const prepareData = reviews.reduce((acc, item) => {
+    acc.push({
+      id: item._id,
+      created_at: item.createdAt,
+      updated_at: item.updatedAt,
+      text: item.text,
+      status: item.status,
+      rate: item.rate,
+      anonim: item.anonim,
+      author: {
+        first_name: item.author.first_name,
+        last_name: item.author.last_name,
+        id: item.author._id,
+      },
+      property: {
+        id: item.property._id,
+        morion: item.property.morion,
+        name: item.property.name,
+        images: item.property.images.items?.filter((image) => !!image.id),
+      },
+    });
+    return acc;
+  }, []);
+
+  return res.status(200).send({ data: prepareData });
+};
+
 const getReviewsByPropertyId = async (req, res, next) => {
   const reviews = await reviewModel.find({ property: req.query.id }).populate({
     path: "author",
@@ -71,4 +144,5 @@ module.exports = {
   postReview,
   deleteReview,
   getReviewsByPropertyId,
+  getLastReviews,
 };
