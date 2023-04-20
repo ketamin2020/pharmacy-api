@@ -12,6 +12,8 @@ const propertiesSchema = new Schema(
     morion: { type: Number, required: true, unique: true },
     external_code: { type: String, required: false },
     name: { type: String, required: true, default: "Торгова назва" },
+    views: { type: Number, default: 0 },
+    sold: { type: Number, default: 0 },
     attributes: {
       main: {
         id: { type: ObjectId, default: ObjectId() },
@@ -134,6 +136,14 @@ const propertiesSchema = new Schema(
   },
   { timestamps: true }
 );
+propertiesSchema.methods.addView = function () {
+  this.views++;
+  return this.save();
+};
+propertiesSchema.methods.addSold = function () {
+  this.sold++;
+  return this.save();
+};
 
 const propertyModel = mongoose.model("Properties", propertiesSchema);
 

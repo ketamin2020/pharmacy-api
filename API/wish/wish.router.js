@@ -5,7 +5,11 @@ const asyncWrapper = require("../../utils/asyncWrapper");
 
 const wishRouter = Router();
 
-wishRouter.get("/wishlist", asyncWrapper(wishControllers.getWishList));
+wishRouter.get(
+  "/wishlist",
+  asyncWrapper(authMiddleware.withAuth),
+  asyncWrapper(wishControllers.getWishList)
+);
 wishRouter.post(
   "/wishlist-create",
   asyncWrapper(authMiddleware.withAuth),

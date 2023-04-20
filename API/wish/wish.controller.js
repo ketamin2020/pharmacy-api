@@ -1,35 +1,28 @@
 const wishModel = require("./wish.model");
-
+const userModel = require("../users/users.model");
 const getWishList = async (req, res, next) => {
-  // const allBrands = await brandsModel.find({});
-  // const brandsList = allBrands.reduce((list, brand) => {
-  //   list.push({
-  //     id: brand._id,
-  //     name: brand.name,
-  //     image: brand.logo.url,
-  //     url: brand.url,
-  //     created_at: brand.createdAt,
-  //   });
-  //   return list;
-  // }, []);
-  // return res.status(200).send({ data: brandsList });
+  const list = await wishModel.find({ user_id: req.user._id });
+  const prepareList = list.reduce((list, item) => {
+    list.push({
+      id: item._id,
+      products: item.products,
+      user_id: item.user_id,
+      created_at: item.createdAt,
+    });
+    return list;
+  }, []);
+  return res.status(200).send({ data: prepareList?.[0] });
 };
 const postWish = async (req, res, next) => {
-  // const { name, url, logo } = req.body;
-  // const slug = slugify(name, {
-  //   replacement: "-", // replace spaces with replacement character, defaults to `-`
-  //   lower: true, // convert to lower case, defaults to `false`
-  // });
-  // const brand = new brandsModel({
-  //   name,
-  //   url,
-  //   logo,
-  //   slug,
-  // });
-  // const newBrand = await brand.save();
-  // return res
-  //   .status(200)
-  //   .send({ id: newBrand._id, name: newBrand.name, logo: newBrand.logo });
+  const { productId } = req.body;
+
+  const wish = await wishModel.findOneAndUpdate(
+    { user_id: req.user._id },
+    { $push: { products: { $each: [productId] } } },
+    { new: true, upsert: true }
+  );
+
+  return res.status(200).send({ data: wish });
 };
 const putWish = (req, res, next) => {};
 const deleteWish = async (req, res, next) => {

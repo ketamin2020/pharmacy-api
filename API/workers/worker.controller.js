@@ -1,4 +1,5 @@
 const workerModel = require("./worker.model");
+const userModel = require("../users/users.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const httpStatus = require("http-status");
@@ -44,7 +45,7 @@ const deleteWorker = async (req, res, next) => {
 
 const loginWorker = async (req, res, next) => {
   const { email, password, phone } = req.body;
-  const worker = await workerModel.findOne({ phone });
+  const worker = await userModel.findOne({ phone });
   if (!worker)
     return res.status(401).json({
       message: httpStatus.UNAUTHORIZED,
@@ -60,6 +61,7 @@ const loginWorker = async (req, res, next) => {
       return res.status(201).json({
         token,
         id: worker._id,
+        admin: true,
         role: worker.position,
       });
     } else {

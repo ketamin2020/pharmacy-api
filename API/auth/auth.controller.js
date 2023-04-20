@@ -1,5 +1,6 @@
 const userModel = require("../users/users.model");
 const wishModel = require("../wish/wish.model");
+const authModel = require("./auth.model");
 const jwt = require("jsonwebtoken");
 
 async function userLogin(req, res) {
@@ -10,9 +11,10 @@ async function userLogin(req, res) {
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: 30 * 24 * 60 * 60,
     });
+
     return res.status(201).json({
       token,
-      admin: false,
+      admin: true,
       id: user._id,
     });
   }
