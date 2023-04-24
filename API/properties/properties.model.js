@@ -137,11 +137,11 @@ const propertiesSchema = new Schema(
   { timestamps: true }
 );
 propertiesSchema.methods.addView = function () {
-  this.views++;
+  this.views = this.views += 1;
   return this.save();
 };
 propertiesSchema.methods.addSold = function () {
-  this.sold++;
+  this.sold = this.sold += 1;
   return this.save();
 };
 

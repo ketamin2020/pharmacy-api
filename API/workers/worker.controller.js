@@ -50,7 +50,7 @@ const loginWorker = async (req, res, next) => {
     return res.status(401).json({
       message: httpStatus.UNAUTHORIZED,
     });
-  const token = jwt.sign({ id: phone }, process.env.JWT_SECRET, {
+  const token = jwt.sign({ id: worker._id }, process.env.JWT_SECRET, {
     expiresIn: 30 * 24 * 60 * 60,
   });
 

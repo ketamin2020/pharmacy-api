@@ -28,6 +28,8 @@ const postProperty = async (req, res, next) => {
     morion,
     external_code,
     name,
+    views: 1,
+    sold: 1,
     attributes: {
       main: {
         items: main,

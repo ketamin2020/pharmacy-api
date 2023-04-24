@@ -497,7 +497,7 @@ const getDrugById = async (req, res, next) => {
     })
     .select("attributes external_code morion name _id updatedAt ");
 
-  await property.addView();
+  // await property.addView();
 
   const price = await priceModel
     .findOne({ morion: property.morion })

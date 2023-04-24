@@ -12,6 +12,7 @@ const getGroups = async (req, res, next) => {
       id: group._id,
       slug: group.slug,
       group_name: group.group_name,
+      group_image: group?.group_image || "",
       children: group.children,
     });
     return list;
@@ -25,6 +26,7 @@ const getGroupsPublic = async (req, res, next) => {
       id: group._id,
       slug: group.slug,
       group_name: group.group_name,
+      group_image: group.group_image,
       children: group.children,
     });
     return list;
@@ -49,6 +51,7 @@ const postGroup = async (req, res, next) => {
         $push: {
           children: {
             ...req.body,
+            group_image: req.body.group_image,
             slug,
             id: ObjectId().toHexString(),
             children: [],
@@ -66,6 +69,7 @@ const postGroup = async (req, res, next) => {
         $push: {
           "children.$[elem].children": {
             ...req.body,
+            group_image: req.body.group_image,
             slug,
             id: ObjectId().toHexString(),
           },
@@ -97,6 +101,7 @@ const putGroup = async (req, res, next) => {
         $set: {
           "children.$.group_name": req.body.group_name,
           "children.$.slug": slug,
+          "children.$.group_image": req.body?.group_image,
         },
       }
     );
@@ -112,6 +117,7 @@ const putGroup = async (req, res, next) => {
         $set: {
           "children.$[i].children.$[j].group_name": req.body.group_name,
           "children.$[i].children.$[j].slug": slug,
+          "children.$[i].children.$[j].group_image": req.body?.group_image,
         },
       },
       {
