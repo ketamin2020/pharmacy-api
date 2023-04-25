@@ -22,17 +22,21 @@ const getDrugsList = async (req, res, next) => {
     ] = second_level;
   }
 
-  if (main_group && !first_lavel && !second_level) {
-    const children = await groupsModel.find({ slug: main_group });
+  const filter = {
+    slug: main_group,
+  };
 
-    const data = children.map((group) => ({
-      group_name: group.group_name,
-      slug: group.slug,
-      children: group.children,
-    }));
-
-    return res.status(200).send({ data });
+  if (first_lavel) {
+    filter.children = {
+      $elemMatch: {
+        slug: first_lavel,
+      },
+    };
   }
+
+  const group = await groupsModel
+    .findOne(filter, first_lavel && { "children.$": 1 })
+    .lean();
 
   const pipeline = [
     {
@@ -439,6 +443,7 @@ const getDrugsList = async (req, res, next) => {
 
   return res.status(200).send({
     data,
+    group,
     properties: {
       trade_name,
       substances,
@@ -453,6 +458,21 @@ const getDrugsList = async (req, res, next) => {
       imported,
     },
   });
+};
+
+const getMedicinesGroupList = async (req, res, next) => {
+  const { main_group } = req.query;
+  if (main_group) {
+    const children = await groupsModel.find({ slug: main_group });
+
+    const data = children.map((group) => ({
+      group_name: group.group_name,
+      slug: group.slug,
+      children: group.children,
+    }));
+
+    return res.status(200).send({ data: data[0] });
+  }
 };
 
 const getDrugById = async (req, res, next) => {
@@ -544,4 +564,4 @@ const getDrugById = async (req, res, next) => {
   });
 };
 
-module.exports = { getDrugsList, getDrugById };
+module.exports = { getDrugsList, getDrugById, getMedicinesGroupList };
