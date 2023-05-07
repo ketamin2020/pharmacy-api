@@ -1,5 +1,6 @@
 const userModel = require("../users/users.model");
 const wishModel = require("../wish/wish.model");
+const basketModel = require("../basket/basket.model");
 const authModel = require("./auth.model");
 const jwt = require("jsonwebtoken");
 
@@ -28,8 +29,15 @@ async function userLogin(req, res) {
     products: [],
   });
 
+  const newBasket = new basketModel({
+    user_id: newUser._id,
+    products: [],
+  });
+
   newUser.wishlist = newWish;
+  newUser.basket = newBasket;
   await newWish.save();
+  await newBasket.save();
   await newUser.save();
 
   const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {

@@ -4,6 +4,7 @@ const priceModel = require("../price/price.model");
 const instructionModel = require("../instructions/instructions.model");
 const imagesModel = require("../images/images.model");
 const reviewModel = require("../reviews/reviews.model");
+
 const getDrugsList = async (req, res, next) => {
   const { main_group, first_lavel, second_level } = req.query;
 
@@ -66,6 +67,17 @@ const getDrugsList = async (req, res, next) => {
         as: "images",
       },
     },
+    {
+      $lookup: {
+        from: "reviews",
+        let: { morion: "$morion" },
+        pipeline: [{ $match: { $expr: { $eq: ["$morion", "$$morion"] } } }],
+        as: "reviews",
+      },
+    },
+    // {
+    //   $unwind: "$reviews",
+    // },
 
     {
       $unwind: "$price",
@@ -88,6 +100,7 @@ const getDrugsList = async (req, res, next) => {
         marked_name: "$marked_name",
         id: "$_id",
         external_code: "$external_code",
+        reviews: "$reviews",
       },
     },
   ];
@@ -428,6 +441,7 @@ const getDrugsList = async (req, res, next) => {
       },
     },
   ];
+
   const data = await propertyModel.aggregate(pipeline).exec();
   const trade_name = await propertyModel.aggregate(pipelineTradeName).exec();
   const makers = await propertyModel.aggregate(pipelineMakers).exec();

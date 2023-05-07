@@ -10,6 +10,11 @@ wishRouter.get(
   asyncWrapper(authMiddleware.withAuth),
   asyncWrapper(wishControllers.getWishList)
 );
+wishRouter.get(
+  "/user-wishlist",
+  asyncWrapper(authMiddleware.withAuth),
+  asyncWrapper(wishControllers.getWishListByUser)
+);
 wishRouter.post(
   "/wishlist-create",
   asyncWrapper(authMiddleware.withAuth),

@@ -1,13 +1,10 @@
-const wishModel = require("./wish.model");
-const propertyModel = require("../properties/properties.model");
-const userModel = require("../users/users.model");
-const priceModel = require("../price/price.model");
+const basketModel = require("./basket.model");
 const mongoose = require("mongoose");
 const {
   Types: { ObjectId },
 } = mongoose;
-const getWishList = async (req, res, next) => {
-  const list = await wishModel.find({ user_id: req.user._id });
+const getBasketList = async (req, res, next) => {
+  const list = await basketModel.find({ user_id: req.user._id });
   const prepareList = list.reduce((list, item) => {
     list.push({
       id: item._id,
@@ -20,8 +17,8 @@ const getWishList = async (req, res, next) => {
   return res.status(200).send({ data: prepareList?.[0] });
 };
 
-const getWishListByUser = async (req, res, next) => {
-  const data = await wishModel.aggregate([
+const getBasketListByUser = async (req, res, next) => {
+  const data = await basketModel.aggregate([
     {
       $match: { user_id: ObjectId(req.user._id) },
     },
@@ -108,13 +105,13 @@ const getWishListByUser = async (req, res, next) => {
       },
     },
   ]);
-  return res.status(200).send({ data: data?.[0] });
+  return res.status(200).send({ data: data?.[0] || [] });
 };
 
-const postWish = async (req, res, next) => {
+const postBasket = async (req, res, next) => {
   const { productId } = req.body;
 
-  const wish = await wishModel.findOneAndUpdate(
+  const wish = await basketModel.findOneAndUpdate(
     { user_id: req.user._id },
     { $push: { products: { $each: [productId] } } },
     { new: true, upsert: true }
@@ -122,11 +119,11 @@ const postWish = async (req, res, next) => {
 
   return res.status(200).send({ data: wish });
 };
-const putWish = (req, res, next) => {};
-const deleteWish = async (req, res, next) => {
+const putBasket = (req, res, next) => {};
+const deleteBasket = async (req, res, next) => {
   const { id } = req.query;
 
-  const result = await wishModel.updateOne(
+  const result = await basketModel.updateOne(
     { user_id: ObjectId(req.user._id) },
     { $pull: { products: id } }
   );
@@ -134,9 +131,9 @@ const deleteWish = async (req, res, next) => {
 };
 
 module.exports = {
-  getWishList,
-  postWish,
-  putWish,
-  deleteWish,
-  getWishListByUser,
+  getBasketList,
+  getBasketListByUser,
+  postBasket,
+  putBasket,
+  deleteBasket,
 };

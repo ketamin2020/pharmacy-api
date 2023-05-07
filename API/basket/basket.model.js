@@ -5,7 +5,7 @@ const {
   Schema,
   Types: { ObjectId },
 } = mongoose;
-const wishSchema = new Schema(
+const basketSchema = new Schema(
   {
     user_id: { type: ObjectId, required: true, unique: true },
     products: [{ type: ObjectId, ref: "Properties" }],
@@ -13,6 +13,6 @@ const wishSchema = new Schema(
   { timestamps: true }
 );
 
-const wishModel = mongoose.model("Wish", wishSchema);
+const basketModel = mongoose.model("Basket", basketSchema);
 
-module.exports = wishModel;
+module.exports = basketModel;

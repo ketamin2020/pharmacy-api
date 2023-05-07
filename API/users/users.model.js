@@ -15,6 +15,7 @@ const userSchema = new Schema(
     email: { type: String, required: false, default: "" },
     avatar: { type: Object, required: false, default: {} },
     wishlist: { type: ObjectId, ref: "Wish", default: "" },
+    basket: { type: ObjectId, ref: "Basket", default: "" },
     reviews: { type: Array, required: false, default: [] },
     orders: { type: Array, required: false, default: [] },
     basket: { type: Array, required: false, default: [] },
