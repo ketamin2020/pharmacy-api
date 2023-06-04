@@ -8,7 +8,12 @@ const {
 const basketSchema = new Schema(
   {
     user_id: { type: ObjectId, required: true, unique: true },
-    products: [{ type: ObjectId, ref: "Properties" }],
+    products: [
+      {
+        product: { type: ObjectId, ref: "Properties" },
+        qty: { type: Number, default: 1 },
+      },
+    ],
   },
   { timestamps: true }
 );

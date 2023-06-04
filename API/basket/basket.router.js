@@ -30,5 +30,10 @@ basketRouter.delete(
   asyncWrapper(authMiddleware.withAuth),
   asyncWrapper(basketControllers.deleteBasket)
 );
+basketRouter.put(
+  "/basket/:itemId/:modifier",
+  asyncWrapper(authMiddleware.withAuth),
+  asyncWrapper(basketControllers.changeQty)
+);
 
 module.exports = basketRouter;
