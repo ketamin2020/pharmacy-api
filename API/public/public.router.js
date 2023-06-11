@@ -11,5 +11,13 @@ publicRouter.get(
   asyncWrapper(publicControllers.getMedicinesGroupList)
 );
 publicRouter.get("/drug", asyncWrapper(publicControllers.getDrugById));
+publicRouter.get(
+  "/search-address",
+  asyncWrapper(publicControllers.searchByCityName)
+);
+publicRouter.get(
+  "/search-werehouse",
+  asyncWrapper(publicControllers.searchByWerehouse)
+);
 
 module.exports = publicRouter;

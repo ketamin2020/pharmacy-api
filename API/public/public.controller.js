@@ -4,6 +4,9 @@ const priceModel = require("../price/price.model");
 const instructionModel = require("../instructions/instructions.model");
 const imagesModel = require("../images/images.model");
 const reviewModel = require("../reviews/reviews.model");
+const Novaposhta = require("../../service/novaposhta");
+
+const api = new Novaposhta();
 
 const getDrugsList = async (req, res, next) => {
   const { main_group, first_lavel, second_level } = req.query;
@@ -578,4 +581,59 @@ const getDrugById = async (req, res, next) => {
   });
 };
 
-module.exports = { getDrugsList, getDrugById, getMedicinesGroupList };
+const searchByCityName = async (req, res, next) => {
+  try {
+    await api.api_search_by_address(
+      req.query.search,
+      req.query.limit,
+      req.query.page,
+      (data) => {
+        const parsedData = JSON.parse(data);
+        const prepareData = parsedData.data;
+        if (!!prepareData?.length) {
+          const [cityRes] = prepareData;
+          return res
+            .status(200)
+            .send({ count: cityRes?.TotalCount, cities: cityRes?.Addresses });
+        }
+        return res.status(200).send({ count: 0, cities: [] });
+      },
+      (error, response) => {
+        return res.status(500).send(error);
+      }
+    );
+  } catch (error) {
+    return res.status(500).send(error);
+  }
+};
+
+const searchByWerehouse = async (req, res, next) => {
+  try {
+    await api.api_search_by_werehouse(
+      req.query.search,
+      req.query.limit,
+      req.query.page,
+      req.query.city_ref,
+      (data) => {
+        const parsedData = JSON.parse(data);
+        const prepareData = parsedData.data;
+        return res
+          .status(200)
+          .send({ werehouses: prepareData, count: parsedData.info.totalCount });
+      },
+      (error, response) => {
+        return res.status(500).send(error);
+      }
+    );
+  } catch (error) {
+    return res.status(500).send(error);
+  }
+};
+
+module.exports = {
+  getDrugsList,
+  getDrugById,
+  getMedicinesGroupList,
+  searchByCityName,
+  searchByWerehouse,
+};
