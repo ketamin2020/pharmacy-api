@@ -242,15 +242,16 @@ const deleteBasket = async (req, res, next) => {
 };
 
 const changeQty = async (req, res) => {
-  const itemId = req.params.id;
-  const modifier = req.params.modifier;
+  const itemId = req.body.id;
+  const modifier = req.body.modifier;
 
   // Найти корзину по пользовательскому идентификатору или создать новую корзину
-  let basket = await Basket.findOne({ user_id: req.user._id });
+  let basket = await basketModel.findOne({ user_id: req.user._id });
   if (!basket) {
-    basket = new Basket({ user_id: req.user._id });
+    basket = new basketModel({ user_id: req.user._id });
   }
 
+  console.log(basket.products, "basket.products");
   // Найти айтем в корзине
   const item = basket.products.find((p) => p.product.equals(itemId));
   if (!item) {

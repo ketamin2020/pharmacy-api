@@ -32,6 +32,8 @@ const publicRouter = require("./public/public.router");
 const reviewRouter = require("./reviews/reviews.router");
 const wishRouter = require("./wish/wish.router");
 const basketRouter = require("./basket/basket.router");
+const orderedRouter = require("./ordered/ordered.router");
+const soldRouter = require("./sold/sold.router");
 const ApiError = require("../utils/ApiError");
 const helmet = require("helmet");
 const bodyParser = require("body-parser");
@@ -136,6 +138,8 @@ module.exports = class taskMgrServer {
     this.server.use("/api/review", reviewRouter);
     this.server.use("/api/wishes", wishRouter);
     this.server.use("/api/basket", basketRouter);
+    this.server.use("/api/order", orderedRouter);
+    this.server.use("/api/sold", soldRouter);
 
     console.log("Routes initialized");
   }

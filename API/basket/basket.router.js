@@ -31,7 +31,7 @@ basketRouter.delete(
   asyncWrapper(basketControllers.deleteBasket)
 );
 basketRouter.put(
-  "/basket/:itemId/:modifier",
+  "/qty",
   asyncWrapper(authMiddleware.withAuth),
   asyncWrapper(basketControllers.changeQty)
 );
