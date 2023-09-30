@@ -1,22 +1,12 @@
 const partnerModel = require("./partner.model");
 const slugify = require("slugify");
+const pick = require("../../utils/pick.js");
 const getPartners = async (req, res, next) => {
-  const allPartners = await partnerModel.find({});
+  const filter = pick(req.query, ["first_name"]);
+  const options = pick(req.query, ["order", "sort_field", "per_page", "page"]);
 
-  const partnerList = allPartners.reduce((list, partner) => {
-    list.push({
-      id: partner._id,
-      name: partner.name,
-      full_address: partner.full_address,
-      common_phone: partner.common_phone,
-      common_email: partner.common_email,
-      ordering_email: partner.ordering_email,
-      ordering_phone: partner.ordering_phone,
-      business_hours: partner.business_hours,
-    });
-    return list;
-  }, []);
-  return res.status(200).send({ data: partnerList });
+  const data = await partnerModel.paginate(filter, options);
+  return res.status(200).send({ data });
 };
 const postPartner = async (req, res, next) => {
   const { name } = req.body;

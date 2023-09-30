@@ -2,14 +2,10 @@ const { Router } = require("express");
 const authHiddleware = require("../middlewares/authorization");
 const userControllers = require("./users.controller");
 const asyncWrapper = require("../../utils/asyncWrapper");
-
+const { auth } = require("../middlewares/auth");
 const userRouter = Router();
 
-userRouter.get(
-  "/get",
-  asyncWrapper(authHiddleware.withAuth),
-  asyncWrapper(userControllers.getUser)
-);
+userRouter.get("/get", asyncWrapper(userControllers.getUsers));
 userRouter.get(
   "/get-by-token",
 

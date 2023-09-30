@@ -1,29 +1,11 @@
 const makersModel = require("./makers.model");
-const slugify = require("slugify");
+const pick = require("../../utils/pick.js");
 const getMakers = async (req, res, next) => {
-  const allMakers = await makersModel.find({});
-  // full_name: { type: String, required: true },
-  // short_name: { type: String, required: true },
-  // country: { type: String, required: true },
-  // factory: { type: String, required: true },
-  // slug: { type: String, slug: "full_name" },
-  // logo: {
-  //   url: { type: String, required: true },
-  //   slug: { type: String, slug: "full_name" },
-  // },
+  const filter = pick(req.query, ["first_name"]);
+  const options = pick(req.query, ["order", "sort_field", "per_page", "page"]);
 
-  const makersList = allMakers.reduce((list, maker) => {
-    list.push({
-      id: maker._id,
-      full_name: maker.full_name,
-      short_name: maker.short_name,
-      country: maker.country,
-      factory: maker.factory,
-      logo: maker.logo.url,
-    });
-    return list;
-  }, []);
-  return res.status(200).send({ data: makersList });
+  const data = await makersModel.paginate(filter, options);
+  return res.status(200).send({ data });
 };
 const postMaker = async (req, res, next) => {
   // const { first_name } = req.body;

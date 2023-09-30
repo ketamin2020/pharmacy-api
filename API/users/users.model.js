@@ -4,6 +4,9 @@ const {
   Types: { ObjectId },
 } = mongoose;
 
+const { paginate } = require("../../plugin/paginate");
+const { toJSON } = require("../../plugin/toJSON");
+
 const userSchema = new Schema(
   {
     first_name: { type: String, required: false, default: "" },
@@ -23,6 +26,9 @@ const userSchema = new Schema(
   },
   { timestamps: true }
 );
+
+userSchema.plugin(paginate);
+userSchema.plugin(toJSON);
 
 const userModel = mongoose.model("Users", userSchema);
 

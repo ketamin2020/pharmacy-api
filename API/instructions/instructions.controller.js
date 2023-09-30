@@ -1,19 +1,13 @@
 const httpStatus = require("http-status");
 const instructionsModel = require("./instructions.model");
+const pick = require("../../utils/pick.js");
 
 const getInstructions = async (req, res, next) => {
-  const allInstrucrion = await instructionsModel.find({});
-  const instructionList = allInstrucrion.reduce((list, instruction) => {
-    list.push({
-      id: instruction._id,
-      name: instruction.name,
-      section: instruction.section,
-      morion: instruction.morion,
-      external_code: instruction.external_code,
-    });
-    return list;
-  }, []);
-  return res.status(200).send({ data: instructionList });
+  const filter = pick(req.query, ["first_name"]);
+  const options = pick(req.query, ["order", "sort_field", "per_page", "page"]);
+
+  const data = await instructionsModel.paginate(filter, options);
+  return res.status(200).send({ data });
 };
 const postInstruction = async (req, res, next) => {
   const instruction = new instructionsModel(req.body);

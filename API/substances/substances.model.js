@@ -5,6 +5,8 @@ const {
   Schema,
   Types: { ObjectId },
 } = mongoose;
+const { paginate } = require("../../plugin/paginate");
+const { toJSON } = require("../../plugin/toJSON");
 const substanceSchema = new Schema(
   {
     name_ua: { type: String, required: true, unique: true },
@@ -15,6 +17,8 @@ const substanceSchema = new Schema(
   },
   { timestamps: true }
 );
+substanceSchema.plugin(paginate);
+substanceSchema.plugin(toJSON);
 
 const substanceModel = mongoose.model("Substance", substanceSchema);
 

@@ -3,20 +3,15 @@ const { uploadFile } = require("../services/s3");
 const slugify = require("slugify");
 const httpStatus = require("http-status");
 require("dotenv").config();
-const getBrands = async (req, res, next) => {
-  const allBrands = await brandsModel.find({});
+const pick = require("../../utils/pick.js");
 
-  const brandsList = allBrands.reduce((list, brand) => {
-    list.push({
-      id: brand._id,
-      name: brand.name,
-      image: brand.logo.url,
-      url: brand.url,
-      created_at: brand.createdAt,
-    });
-    return list;
-  }, []);
-  return res.status(200).send({ data: brandsList });
+const getBrands = async (req, res, next) => {
+  const filter = pick(req.query, ["first_name"]);
+  const options = pick(req.query, ["order", "sort_field", "per_page", "page"]);
+
+  const data = await brandsModel.paginate(filter, options);
+
+  return res.status(200).send({ data });
 };
 const postBrand = async (req, res, next) => {
   const { name, url, logo } = req.body;

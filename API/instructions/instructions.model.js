@@ -6,6 +6,9 @@ const {
   Types: { ObjectId },
 } = mongoose;
 
+const { paginate } = require("../../plugin/paginate");
+const { toJSON } = require("../../plugin/toJSON");
+
 const instructionsSchema = new Schema(
   {
     morion: { type: Number, required: true, unique: true },
@@ -125,7 +128,8 @@ const instructionsSchema = new Schema(
   },
   { timestamps: true }
 );
-
+instructionsSchema.plugin(paginate);
+instructionsSchema.plugin(toJSON);
 const instructionModel = mongoose.model("Instructions", instructionsSchema);
 
 module.exports = instructionModel;

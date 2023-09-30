@@ -6,21 +6,15 @@ const {
   Schema,
   Types: { ObjectId },
 } = mongoose;
-const getProperties = async (req, res, next) => {
-  const allProperties = await propertiesModel.find({});
 
-  const propertiesList = allProperties.reduce((list, property) => {
-    list.push({
-      id: property._id,
-      name: property.name,
-      attributes: property.attributes,
-      morion: property.morion,
-      external_code: property.external_code,
-      slug: property.slug,
-    });
-    return list;
-  }, []);
-  return res.status(200).send({ data: propertiesList });
+const pick = require("../../utils/pick.js");
+
+const getProperties = async (req, res, next) => {
+  const filter = pick(req.query, ["first_name"]);
+  const options = pick(req.query, ["order", "sort_field", "per_page", "page"]);
+
+  const data = await propertiesModel.paginate(filter, options);
+  return res.status(200).send({ data });
 };
 const postProperty = async (req, res, next) => {
   const { morion, external_code, name, main, warnings } = req.body;

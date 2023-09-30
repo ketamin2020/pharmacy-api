@@ -1,18 +1,12 @@
 const substancesModel = require("./substances.model");
+const pick = require("../../utils/pick.js");
 
 const getSubstances = async (req, res, next) => {
-  const allSubstances = await substancesModel.find({});
-  const subctancesList = allSubstances.reduce((list, subctance) => {
-    list.push({
-      id: subctance._id,
-      name_ua: subctance.name_ua,
-      name_eu: subctance.name_eu,
-      index: subctance.index,
-      head_title: subctance.head_title,
-    });
-    return list;
-  }, []);
-  return res.status(200).send({ data: subctancesList });
+  const filter = pick(req.query, ["first_name"]);
+  const options = pick(req.query, ["order", "sort_field", "per_page", "page"]);
+
+  const data = await substancesModel.paginate(filter, options);
+  return res.status(200).send({ data });
 };
 const postSubstance = async (req, res, next) => {
   const { name_eu } = req.body;

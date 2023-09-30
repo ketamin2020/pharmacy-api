@@ -1,6 +1,20 @@
 const httpStatus = require("http-status");
 const usersModel = require("./users.model");
 const jwt = require("jsonwebtoken");
+
+const pick = require("../../utils/pick");
+
+const getUsers = async (req, res, next) => {
+  const filter = pick(req.query, ["first_name"]);
+  const options = pick(req.query, ["order", "sort_field", "per_page", "page"]);
+
+  const users = await usersModel.paginate(filter, options);
+
+  if (!users) return res.status(404).send({ data: "User not found" });
+
+  return res.status(200).send({ data: users });
+};
+
 const getUser = async (req, res, next) => {
   const user = await usersModel
     .findById(req.user._id)
@@ -47,4 +61,5 @@ module.exports = {
   putUser,
   deleteUser,
   getUserByToken,
+  getUsers,
 };

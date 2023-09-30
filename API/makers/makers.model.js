@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 const slug = require("mongoose-slug-generator");
 mongoose.plugin(slug);
 const { Schema } = mongoose;
+
+const { paginate } = require("../../plugin/paginate");
+const { toJSON } = require("../../plugin/toJSON");
+
 const makersSchema = new Schema(
   {
     full_name: { type: String, required: true },
@@ -16,6 +20,9 @@ const makersSchema = new Schema(
   },
   { timestamps: true }
 );
+
+makersSchema.plugin(paginate);
+makersSchema.plugin(toJSON);
 
 const makersModel = mongoose.model("Makers", makersSchema);
 

@@ -1,17 +1,11 @@
 const imagesModel = require("./images.model");
-const slugify = require("slugify");
+const pick = require("../../utils/pick.js");
 const getImages = async (req, res, next) => {
-  const allImages = await imagesModel.find({});
-  const imagesList = allImages.reduce((list, image) => {
-    list.push({
-      id: image._id,
-      items: image.items,
-      created_at: image.createdAt,
-      morion: image.morion,
-    });
-    return list;
-  }, []);
-  return res.status(200).send({ data: imagesList });
+  const filter = pick(req.query, ["first_name"]);
+  const options = pick(req.query, ["order", "sort_field", "per_page", "page"]);
+
+  const data = await imagesModel.paginate(filter, options);
+  return res.status(200).send({ data });
 };
 const postImages = async (req, res, next) => {
   const images = new imagesModel(req.body);

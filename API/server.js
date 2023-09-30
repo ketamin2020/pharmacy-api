@@ -3,7 +3,8 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const mongoose = require("mongoose");
-
+const passport = require("passport");
+const { jwtStrategy } = require("../utils/password");
 const { errorConverter, errorHandler } = require("./middlewares/error");
 const authRouter = require("./auth/auth.router");
 const usersRouter = require("./users/users.router");
@@ -34,6 +35,8 @@ const wishRouter = require("./wish/wish.router");
 const basketRouter = require("./basket/basket.router");
 const orderedRouter = require("./ordered/ordered.router");
 const soldRouter = require("./sold/sold.router");
+const adminAuth = require("./auth_admin/auth_router");
+const adminUsers = require("./auth_admin/user_router");
 const ApiError = require("../utils/ApiError");
 const helmet = require("helmet");
 const bodyParser = require("body-parser");
@@ -91,6 +94,9 @@ module.exports = class taskMgrServer {
       })
     );
 
+    this.server.use(passport.initialize());
+    passport.use("jwt", jwtStrategy);
+
     console.log("middlewares initialized");
   }
 
@@ -113,6 +119,7 @@ module.exports = class taskMgrServer {
     // input routers here
     this.server.use("/api/auth", authRouter);
     this.server.use("/api/users", usersRouter);
+    this.server.use("/api/users", adminUsers);
     this.server.use("/api/upload", uploadRouter);
     this.server.use("/api/brands", brandsRouter);
     this.server.use("/api/partners", partnerRouter);
@@ -140,6 +147,7 @@ module.exports = class taskMgrServer {
     this.server.use("/api/basket", basketRouter);
     this.server.use("/api/order", orderedRouter);
     this.server.use("/api/sold", soldRouter);
+    this.server.use("/api/admin", adminAuth);
 
     console.log("Routes initialized");
   }

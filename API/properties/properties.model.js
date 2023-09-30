@@ -7,6 +7,9 @@ const {
   Types: { ObjectId },
 } = mongoose;
 
+const { toJSON } = require("../../plugin/toJSON");
+const { paginate } = require("../../plugin/paginate");
+
 const propertiesSchema = new Schema(
   {
     morion: { type: Number, required: true, unique: true },
@@ -144,6 +147,8 @@ propertiesSchema.methods.addSold = function () {
   this.sold = this.sold += 1;
   return this.save();
 };
+propertiesSchema.plugin(paginate);
+propertiesSchema.plugin(toJSON);
 
 const propertyModel = mongoose.model("Properties", propertiesSchema);
 

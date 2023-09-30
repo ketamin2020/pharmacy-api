@@ -5,6 +5,10 @@ const {
   Schema,
   Types: { ObjectId },
 } = mongoose;
+
+const { paginate } = require("../../plugin/paginate");
+const { toJSON } = require("../../plugin/toJSON");
+
 const partnerSchema = new Schema(
   {
     name: { type: String, required: true, unique: true },
@@ -21,6 +25,9 @@ const partnerSchema = new Schema(
   },
   { timestamps: true }
 );
+
+partnerSchema.plugin(paginate);
+partnerSchema.plugin(toJSON);
 
 const partnerModel = mongoose.model("Partners", partnerSchema);
 

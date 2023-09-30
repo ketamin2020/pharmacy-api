@@ -5,6 +5,9 @@ const {
   Schema,
   Types: { ObjectId },
 } = mongoose;
+const { paginate } = require("../../plugin/paginate");
+const { toJSON } = require("../../plugin/toJSON");
+
 const priceSchema = new Schema(
   {
     code: { type: String, required: false },
@@ -16,6 +19,8 @@ const priceSchema = new Schema(
   },
   { timestamps: true }
 );
+priceSchema.plugin(paginate);
+priceSchema.plugin(toJSON);
 
 const priceModel = mongoose.model("Price", priceSchema);
 

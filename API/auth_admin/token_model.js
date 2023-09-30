@@ -1,8 +1,8 @@
-import { Schema, model, SchemaTypes, Document, Model } from 'mongoose'
-import { tokenTypes } from '../constants/token_types.ts'
-import { IToken } from '../types/Token.js'
+const mongoose = require("mongoose");
+const { Schema, SchemaTypes } = mongoose;
+const { tokenTypes } = require("../../constants/token_types");
 
-const tokenSchema = new Schema<IToken>(
+const tokenSchema = new Schema(
   {
     token: {
       type: String,
@@ -11,12 +11,16 @@ const tokenSchema = new Schema<IToken>(
     },
     user: {
       type: SchemaTypes.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true,
     },
     type: {
       type: String,
-      enum: [tokenTypes.REFRESH, tokenTypes.RESET_PASSWORD, tokenTypes.VERIFY_EMAIL],
+      enum: [
+        tokenTypes.REFRESH,
+        tokenTypes.RESET_PASSWORD,
+        tokenTypes.VERIFY_EMAIL,
+      ],
       required: true,
     },
     expires: {
@@ -30,7 +34,7 @@ const tokenSchema = new Schema<IToken>(
   },
   {
     timestamps: true,
-  },
-)
+  }
+);
 
-export const tokenModel: Model<IToken> = model<IToken>('Token', tokenSchema)
+module.exports = mongoose.model("Token", tokenSchema);

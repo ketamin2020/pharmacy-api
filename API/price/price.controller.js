@@ -1,24 +1,14 @@
 const priceModel = require("./price.model");
+const pick = require("../../utils/pick");
 
 const getPrices = async (req, res, next) => {
-  const items = await priceModel.find({}).populate("partner");
+  const filter = pick(req.query, ["first_name"]);
+  const options = pick(req.query, ["order", "sort_field", "per_page", "page"]);
+  options.populate = "partner";
 
-  const arr = items.reduce((acc, item) => {
-    acc.push({
-      id: item._id,
-      morion: item.morion,
-      createdAt: item.createdAt,
-      updatedAt: item.updatedAt,
-      date: item.date,
-      current: item.current,
-      code: item.code,
-      previous_price: item.previous_price,
-      partner: { id: item.partner._id, name: item.partner.name },
-    });
-    return acc;
-  }, []);
+  const items = await priceModel.paginate(filter, options);
 
-  return res.status(200).send({ data: arr });
+  return res.status(200).send({ data: items });
 };
 const postPrice = async (req, res, next) => {
   const objToCreate = {
