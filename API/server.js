@@ -37,6 +37,8 @@ const orderedRouter = require("./ordered/ordered.router");
 const soldRouter = require("./sold/sold.router");
 const adminAuth = require("./auth_admin/auth_router");
 const adminUsers = require("./auth_admin/user_router");
+const drugsRouter = require("./drugs/drugs.router");
+const importRouter = require("./import/import.router");
 const ApiError = require("../utils/ApiError");
 const helmet = require("helmet");
 const bodyParser = require("body-parser");
@@ -148,6 +150,8 @@ module.exports = class taskMgrServer {
     this.server.use("/api/order", orderedRouter);
     this.server.use("/api/sold", soldRouter);
     this.server.use("/api/admin", adminAuth);
+    this.server.use("/api/admin-drugs", drugsRouter);
+    this.server.use("/api/import", importRouter);
 
     console.log("Routes initialized");
   }

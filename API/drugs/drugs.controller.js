@@ -9,38 +9,12 @@ const Novaposhta = require("../../service/novaposhta");
 const api = new Novaposhta();
 
 const getDrugsList = async (req, res, next) => {
-  const { main_group, first_lavel, second_level } = req.query;
-
-  const filters = {
-    "attributes.main.items.groups.main_group.slug": main_group,
-  };
-
-  if (first_lavel) {
-    filters[
-      "attributes.main.items.groups.first_lavel_group.slug"
-    ] = first_lavel;
-  }
-  if (second_level) {
-    filters[
-      "attributes.main.items.groups.second_lavel_group.slug"
-    ] = second_level;
-  }
-
-  const filter = {
-    slug: main_group,
-  };
-
-  if (first_lavel) {
-    filter.children = {
-      $elemMatch: {
-        slug: first_lavel,
-      },
-    };
-  }
-
-  const group = await groupsModel
-    .findOne(filter, first_lavel && { "children.$": 1 })
-    .lean();
+  const { page, page_size } = req.query;
+  const pageNumber = parseInt(page, 10) || 1;
+  const pageSize = parseInt(page_size, 10) || 10;
+  const skip = (pageNumber - 1) * pageSize;
+  const filters = {};
+  const group = await groupsModel.findOne().lean();
 
   const pipeline = [
     {
@@ -78,9 +52,6 @@ const getDrugsList = async (req, res, next) => {
         as: "reviews",
       },
     },
-    // {
-    //   $unwind: "$reviews",
-    // },
 
     {
       $unwind: "$price",
@@ -104,7 +75,16 @@ const getDrugsList = async (req, res, next) => {
         id: "$_id",
         external_code: "$external_code",
         reviews: "$reviews",
+        created_at: "$createdAt",
+        updated_at: "$updatedAt",
       },
+    },
+
+    {
+      $skip: skip,
+    },
+    {
+      $limit: pageSize,
     },
   ];
 
@@ -446,34 +426,45 @@ const getDrugsList = async (req, res, next) => {
   ];
 
   const data = await propertyModel.aggregate(pipeline).exec();
-  const trade_name = await propertyModel.aggregate(pipelineTradeName).exec();
-  const makers = await propertyModel.aggregate(pipelineMakers).exec();
-  const substances = await propertyModel.aggregate(pipelineSubstance).exec();
-  const dosages = await propertyModel.aggregate(pipelineDosage).exec();
-  const forms = await propertyModel.aggregate(pipelineForms).exec();
-  const route = await propertyModel.aggregate(pipelineRoute).exec();
-  const quantity = await propertyModel.aggregate(pipelineQty).exec();
-  const temperature = await propertyModel.aggregate(pipelineTemperature).exec();
-  const packages = await propertyModel.aggregate(pipelinePackages).exec();
-  const warnings = await propertyModel.aggregate(pipelineWarnings);
-  const imported = await propertyModel.aggregate(pipelineImported);
+  // const trade_name = await propertyModel.aggregate(pipelineTradeName).exec();
+  // const makers = await propertyModel.aggregate(pipelineMakers).exec();
+  // const substances = await propertyModel.aggregate(pipelineSubstance).exec();
+  // const dosages = await propertyModel.aggregate(pipelineDosage).exec();
+  // const forms = await propertyModel.aggregate(pipelineForms).exec();
+  // const route = await propertyModel.aggregate(pipelineRoute).exec();
+  // const quantity = await propertyModel.aggregate(pipelineQty).exec();
+  // const temperature = await propertyModel.aggregate(pipelineTemperature).exec();
+  // const packages = await propertyModel.aggregate(pipelinePackages).exec();
+  // const warnings = await propertyModel.aggregate(pipelineWarnings);
+  // const imported = await propertyModel.aggregate(pipelineImported);
+
+  const totalCount = await propertyModel.countDocuments(filters).exec();
+  const totalPages = Math.ceil(totalCount / pageSize);
+
+  const meta = {
+    current_page: pageNumber,
+    page_size: pageSize,
+    total_pages: totalPages,
+    total_items: totalCount,
+  };
 
   return res.status(200).send({
+    meta,
     data,
-    group,
-    properties: {
-      trade_name,
-      substances,
-      makers,
-      dosages,
-      forms,
-      route,
-      quantity,
-      temperature,
-      packages,
-      warnings,
-      imported,
-    },
+    // group,
+    // properties: {
+    //   trade_name,
+    //   substances,
+    //   makers,
+    //   dosages,
+    //   forms,
+    //   route,
+    //   quantity,
+    //   temperature,
+    //   packages,
+    //   warnings,
+    //   imported,
+    // },
   });
 };
 
@@ -494,7 +485,6 @@ const getMedicinesGroupList = async (req, res, next) => {
 
 const getDrugById = async (req, res, next) => {
   if (!req.query.id) return;
-
   const property = await propertyModel
     .findOne({ _id: req.query.id })
     .populate({
@@ -541,25 +531,23 @@ const getDrugById = async (req, res, next) => {
     .findOne({ morion: property.morion })
     .populate("partner")
     .select("current morion partner code previous_price");
-
   const instruction = await instructionModel
     .findOne({
       morion: property.morion,
     })
-    .select("name section");
+    .select("name section -_id");
 
   const images = await imagesModel
     .findOne({
       morion: property.morion,
     })
-    .select("items");
+    .select("items ");
 
   const reviews = await reviewModel
     .find({
       property: req.query.id,
     })
     .select("rate");
-
   const rating = reviews.reduce((acc, item) => (acc += +item.rate), 0);
 
   const prepareImages = images.items.filter((item) => !!item.id);
@@ -573,13 +561,13 @@ const getDrugById = async (req, res, next) => {
     price,
     instruction,
     images: prepareImages,
-    partner: price?.partner,
-    morion: property?.morion,
-    name: property?.name,
-    external_code: property?.external_code,
+    partner: price.partner,
+    morion: property.morion,
+    name: property.name,
+    external_code: property.external_code,
     reviews: {
-      count: reviews?.length,
-      rating: (rating / reviews?.length).toFixed(1),
+      count: reviews.length,
+      rating: (rating / reviews.length).toFixed(1),
     },
   });
 };

@@ -22,16 +22,17 @@ const postPrice = async (req, res, next) => {
 };
 
 const updatePrice = async (req, res, next) => {
-  const { id, name, morion, current } = req.body;
+  const { id, name, morion, current, partner } = req.body;
   const item = await priceModel.findById({ _id: id });
-  console.log(item);
+
   const newItem = await priceModel.findOneAndUpdate(
     { _id: id },
     {
       name,
       morion,
       current,
-      previous_price: item.previous_price,
+      partner,
+      previous_price: current,
     }
   );
 

@@ -1,15 +1,19 @@
 const orderedModel = require("./ordered.model");
 const mongoose = require("mongoose");
 const LiqPay = require("../../service/liqpay");
+const pick = require("../../utils/pick.js");
 
 const {
   Types: { ObjectId },
 } = mongoose;
 
 const getOrderedList = async (req, res, next) => {
-  const list = await orderedModel.find();
+  const filter = pick(req.query, ["first_name"]);
+  const options = pick(req.query, ["order", "sort_field", "per_page", "page"]);
 
-  return res.status(200).json({ data: list });
+  const data = await orderedModel.paginate(filter, options);
+
+  return res.status(200).json({ data });
 };
 
 const getOrderedByUser = async (req, res, next) => {

@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 const slug = require("mongoose-slug-generator");
 mongoose.plugin(slug);
+
+const { paginate } = require("../../plugin/paginate");
+const { toJSON } = require("../../plugin/toJSON");
+
 const {
   Schema,
   Types: { ObjectId },
@@ -98,6 +102,9 @@ const orderedSchema = new Schema(
   },
   { timestamps: true }
 );
+
+orderedSchema.plugin(paginate);
+orderedSchema.plugin(toJSON);
 
 const orderedModel = mongoose.model("Ordered", orderedSchema);
 
