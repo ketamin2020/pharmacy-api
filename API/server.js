@@ -72,7 +72,7 @@ module.exports = class taskMgrServer {
   }
 
   initPort() {
-    this.SERVER_PORT = process.env.PORT || 3000;
+    this.SERVER_PORT = process.env.PORT || 8080;
     console.log("port initialized");
   }
 
@@ -85,7 +85,7 @@ module.exports = class taskMgrServer {
     this.server.use(helmet());
     this.server.use(errorConverter);
     this.server.use(errorHandler);
-    this.server.use(morgan("dev"));
+    this.server.use(morgan("combined"));
     this.server.use(bodyParser.urlencoded({ extended: true }));
     this.server.use(
       bodyParser.json({
