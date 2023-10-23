@@ -8,6 +8,12 @@ const getPartners = async (req, res, next) => {
   const data = await partnerModel.paginate(filter, options);
   return res.status(200).send({ data });
 };
+
+const getPartnersList = async (req, res, next) => {
+  const data = await partnerModel.find({});
+  return res.status(200).send(data);
+};
+
 const postPartner = async (req, res, next) => {
   const { name } = req.body;
   const slug = slugify(name, {
@@ -30,4 +36,10 @@ const deletePartner = async (req, res, next) => {
   res.status(200).send({ message: "Partner was deleted successfuly!" });
 };
 
-module.exports = { getPartners, postPartner, putPartner, deletePartner };
+module.exports = {
+  getPartners,
+  postPartner,
+  putPartner,
+  deletePartner,
+  getPartnersList,
+};

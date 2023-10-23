@@ -11,7 +11,13 @@ const getBrands = async (req, res, next) => {
 
   const data = await brandsModel.paginate(filter, options);
 
-  return res.status(200).send({ data });
+  return res.status(200).send(data);
+};
+
+const getBrandsList = async (req, res, next) => {
+  const data = await brandsModel.find({});
+
+  return res.status(200).send(data);
 };
 const postBrand = async (req, res, next) => {
   const { name, url, logo } = req.body;
@@ -43,4 +49,4 @@ const deleteBrand = async (req, res, next) => {
   res.status(200).send({ message: "Brand was deleted successfuly!" });
 };
 
-module.exports = { getBrands, postBrand, putBrand, deleteBrand };
+module.exports = { getBrands, postBrand, putBrand, deleteBrand, getBrandsList };

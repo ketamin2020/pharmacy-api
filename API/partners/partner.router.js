@@ -6,6 +6,10 @@ const asyncWrapper = require("../../utils/asyncWrapper");
 const partnerRouter = Router();
 
 partnerRouter.get("/get", asyncWrapper(PartnerControllers.getPartners));
+partnerRouter.get(
+  "/get-list",
+  asyncWrapper(PartnerControllers.getPartnersList)
+);
 partnerRouter.post("/create", asyncWrapper(PartnerControllers.postPartner));
 partnerRouter.put("/update", asyncWrapper(PartnerControllers.putPartner));
 partnerRouter.delete("/delete", asyncWrapper(PartnerControllers.deletePartner));

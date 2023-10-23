@@ -10,6 +10,7 @@ const bannerSchema = new Schema(
   {
     link: { type: String, default: "", require: true },
     id: { type: String, default: "", require: true },
+    status: { type: Number, default: 1, require: false },
   },
   { timestamps: true }
 );

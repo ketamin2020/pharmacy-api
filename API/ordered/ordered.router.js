@@ -7,7 +7,7 @@ const orderedRouter = Router();
 
 orderedRouter.get(
   "/ordered",
-  asyncWrapper(authMiddleware.withAuth),
+  // asyncWrapper(authMiddleware.withAuth),
   asyncWrapper(orderedControllers.getOrderedList)
 );
 orderedRouter.get(

@@ -3,6 +3,8 @@ const slug = require("mongoose-slug-generator");
 const validator = require("validator");
 mongoose.plugin(slug);
 const { Schema } = mongoose;
+const { toJSON } = require("../../plugin/toJSON");
+
 const mainSchema = new Schema(
   {
     name: { type: String, trim: true, default: "" },
@@ -65,6 +67,8 @@ const mainSchema = new Schema(
   },
   { timestamps: true }
 );
+
+mainSchema.plugin(toJSON);
 
 const mainModel = mongoose.model("Main", mainSchema);
 
