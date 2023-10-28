@@ -20,7 +20,7 @@ const UserRoutes = {
 
 user_router.post(
   UserRoutes.CREATE,
-  catchAsync(authHiddleware.withAuth),
+  // catchAsync(authHiddleware.withAuth),
   validate(validation.createUser),
   catchAsync(userController.createUser)
 );

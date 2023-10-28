@@ -7,7 +7,7 @@ const drugsRouter = Router();
 
 drugsRouter.get(
   "/admin-drugs-list",
-  asyncWrapper(authMiddleware.withAuth),
+  // asyncWrapper(authMiddleware.withAuth),
   asyncWrapper(publicControllers.getDrugsList)
 );
 drugsRouter.get(
