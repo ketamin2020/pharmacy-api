@@ -2,7 +2,15 @@ const priceModel = require("./price.model");
 const pick = require("../../utils/pick");
 
 const getPrices = async (req, res, next) => {
-  const filter = pick(req.query, ["first_name"]);
+  const filter = pick(req.query, [
+    "code",
+    "slug",
+    "current",
+    "previous_price",
+    "morion",
+    "created_at",
+    "updated_at",
+  ]);
   const options = pick(req.query, ["order", "sort_field", "per_page", "page"]);
   options.populate = "partner";
 

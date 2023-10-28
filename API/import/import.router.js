@@ -4,10 +4,12 @@ const importControllers = require("./import.controller");
 const asyncWrapper = require("../../utils/asyncWrapper");
 const upload = require("../common/multer");
 const importRouter = Router();
+const authMiddleware = require("../middlewares/authorization.js");
 
 importRouter.post(
   "/import-price",
-  upload.single('file'),
+  asyncWrapper(authMiddleware.withAuth),
+  upload.single("file"),
   asyncWrapper(importControllers.postImportPrice)
 );
 

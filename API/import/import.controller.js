@@ -19,8 +19,6 @@ const postImportPrice = async (req, res, next) => {
   const worksheet = workbook.Sheets[sheetName];
   const jsonData = xlsx.utils.sheet_to_json(worksheet);
 
-  console.log(jsonData, "jsonData");
-
   const response = await uploadToS3(req.file);
   const file = importModel({
     link: response.Location,

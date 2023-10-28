@@ -6,7 +6,13 @@ require("dotenv").config();
 const pick = require("../../utils/pick.js");
 
 const getBrands = async (req, res, next) => {
-  const filter = pick(req.query, ["first_name"]);
+  const filter = pick(req.query, [
+    "name",
+    "url",
+    "slug",
+    "created_at",
+    "updated_at",
+  ]);
   const options = pick(req.query, ["order", "sort_field", "per_page", "page"]);
 
   const data = await brandsModel.paginate(filter, options);
@@ -40,7 +46,7 @@ const postBrand = async (req, res, next) => {
 const putBrand = (req, res, next) => {};
 const deleteBrand = async (req, res, next) => {
   const { id } = req.query;
-  console.log(req, id);
+
   if (!id)
     return res
       .status(404)

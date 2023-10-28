@@ -4,12 +4,13 @@ const asyncWrapper = require("../../utils/asyncWrapper");
 const uploadRouter = Router();
 const upload = require("../common/multer");
 const { uploadFile, deleteFile } = require("./upload.controller");
+const authHiddleware = require("../middlewares/authorization.js");
 
 uploadRouter.post(
   "/upload-single",
+  asyncWrapper(authHiddleware.withAuth),
   upload.single("image"),
   asyncWrapper(uploadFile)
 );
-// uploadRouter.delete("/delete-single/:id", asyncWrapper(deleteFile));
 
 module.exports = uploadRouter;

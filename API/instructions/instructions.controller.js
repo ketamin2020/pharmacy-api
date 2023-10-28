@@ -3,7 +3,14 @@ const instructionsModel = require("./instructions.model");
 const pick = require("../../utils/pick.js");
 
 const getInstructions = async (req, res, next) => {
-  const filter = pick(req.query, ["first_name"]);
+  const filter = pick(req.query, [
+    "morion",
+    "external_code",
+    "name",
+    "slug",
+    "created_at",
+    "updated_at",
+  ]);
   const options = pick(req.query, ["order", "sort_field", "per_page", "page"]);
 
   const data = await instructionsModel.paginate(filter, options);

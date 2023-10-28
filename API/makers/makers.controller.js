@@ -1,7 +1,16 @@
 const makersModel = require("./makers.model");
 const pick = require("../../utils/pick.js");
+
 const getMakers = async (req, res, next) => {
-  const filter = pick(req.query, ["first_name"]);
+  const filter = pick(req.query, [
+    "full_name",
+    "short_name",
+    "country",
+    "factory",
+    "slug",
+    "created_at",
+    "updated_at",
+  ]);
   const options = pick(req.query, ["order", "sort_field", "per_page", "page"]);
 
   const data = await makersModel.paginate(filter, options);

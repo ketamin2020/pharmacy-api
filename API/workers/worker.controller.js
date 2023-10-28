@@ -3,22 +3,25 @@ const userModel = require("../users/users.model");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const httpStatus = require("http-status");
-const getWorkers = async (req, res, next) => {
-  const allWorkers = await workerModel.find({});
+const pick = require("../../utils/pick.js");
 
-  const workersList = allWorkers.reduce((list, worker) => {
-    list.push({
-      id: worker._id,
-      first_name: worker.first_name,
-      last_name: worker.last_name,
-      full_address: worker.full_address,
-      phone: worker.phone,
-      email: worker.email,
-      position: worker.position,
-    });
-    return list;
-  }, []);
-  return res.status(200).send({ data: workersList });
+const getWorkers = async (req, res, next) => {
+  const filter = pick(req.query, [
+    "first_name",
+    "last_name",
+    "full_address",
+    "phone",
+    "email",
+    "slug",
+    "position",
+    "created_at",
+    "updated_at",
+  ]);
+  const options = pick(req.query, ["order", "sort_field", "per_page", "page"]);
+
+  const allWorkers = await workerModel.paginate(filter, options);
+
+  return res.status(200).send({ data: allWorkers });
 };
 const postWorker = async (req, res, next) => {
   const { password } = req.body;

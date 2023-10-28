@@ -1,3 +1,5 @@
+const moment = require("moment");
+
 const defaultSorter = "created_at";
 
 const Sorter = {
@@ -13,6 +15,64 @@ const paginate = (schema) => {
       sort[options.sort_field] = options.order === Sorter.DESC ? -1 : 1;
     } else {
       sort[defaultSorter] = -1;
+    }
+
+    if (filter["created_at"]) {
+      const dateRange = Array.isArray(filter["created_at"])
+        ? filter["created_at"][0]
+        : filter["created_at"];
+      if (typeof dateRange === "string") {
+        const [startStr, endStr] = dateRange.split("|");
+        const startDate = moment(startStr, "DD/MM/YYYY");
+        const endDate = moment(endStr, "DD/MM/YYYY");
+
+        if (!endStr && startStr) {
+          sort["createdAt"] = startDate === Sorter.DESC ? -1 : 1;
+          delete filter["created_at"];
+          filter["createdAt"] = {
+            $gte: startDate.toDate(),
+            $lte: startDate.add(1, "day").toDate(),
+          };
+        } else {
+          if (startDate.isValid() && endDate.isValid()) {
+            sort["createdAt"] = startDate === Sorter.DESC ? -1 : 1;
+            delete filter["created_at"];
+            filter["createdAt"] = {
+              $gte: startDate.toDate(),
+              $lte: endDate.toDate(),
+            };
+          }
+        }
+      }
+    }
+
+    if (filter["updated_at"]) {
+      const dateRange = Array.isArray(filter["updated_at"])
+        ? filter["updated_at"][0]
+        : filter["updated_at"];
+      if (typeof dateRange === "string") {
+        const [startStr, endStr] = dateRange.split("|");
+        const startDate = moment(startStr, "DD/MM/YYYY");
+        const endDate = moment(endStr, "DD/MM/YYYY");
+
+        if (!endStr && startStr) {
+          sort["updatedAt"] = startDate === Sorter.DESC ? -1 : 1;
+          delete filter["updated_at"];
+          filter["updatedAt"] = {
+            $gte: startDate.toDate(),
+            $lte: startDate.add(1, "day").toDate(),
+          };
+        } else {
+          if (startDate.isValid() && endDate.isValid()) {
+            sort["updatedAt"] = startDate === Sorter.DESC ? -1 : 1;
+            delete filter["updated_at"];
+            filter["updatedAt"] = {
+              $gte: startDate.toDate(),
+              $lte: endDate.toDate(),
+            };
+          }
+        }
+      }
     }
 
     const limit =

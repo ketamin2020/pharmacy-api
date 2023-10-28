@@ -251,7 +251,6 @@ const changeQty = async (req, res) => {
     basket = new basketModel({ user_id: req.user._id });
   }
 
-  console.log(basket.products, "basket.products");
   // Найти айтем в корзине
   const item = basket.products.find((p) => p.product.equals(itemId));
   if (!item) {

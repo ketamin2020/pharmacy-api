@@ -2,7 +2,17 @@ const partnerModel = require("./partner.model");
 const slugify = require("slugify");
 const pick = require("../../utils/pick.js");
 const getPartners = async (req, res, next) => {
-  const filter = pick(req.query, ["first_name"]);
+  const filter = pick(req.query, [
+    "name",
+    "full_address",
+    "common_phone",
+    "common_email",
+    "ordering_email",
+    "ordering_phone",
+    "slug",
+    "created_at",
+    "updated_at",
+  ]);
   const options = pick(req.query, ["order", "sort_field", "per_page", "page"]);
 
   const data = await partnerModel.paginate(filter, options);

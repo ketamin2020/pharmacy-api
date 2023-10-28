@@ -1,4 +1,6 @@
 const orderedModel = require("./ordered.model");
+const wishModel = require("../wish/wish.model");
+const basketModel = require("../basket/basket.model");
 const mongoose = require("mongoose");
 const LiqPay = require("../../service/liqpay");
 const pick = require("../../utils/pick.js");
@@ -17,7 +19,7 @@ const getOrderedList = async (req, res, next) => {
 };
 
 const getOrderedByUser = async (req, res, next) => {
-  const list = await orderedModel.find({ user_id: req.user_id });
+  const list = await orderedModel.find({ user_id: req.user._id });
 
   return res.status(200).json({ data: list });
 };
@@ -34,6 +36,13 @@ const postOrdered = async (req, res, next) => {
 
   const saved = await newOrder.save();
 
+  const removeFromWishes = await wishModel.findByIdAndDelete(
+    req.body.basket_id
+  );
+  const removeFromBasket = await basketModel.findByIdAndDelete(
+    req.body.basket_id
+  );
+
   const liqpay = new LiqPay(
     process.env.PAYMENT_PUBLIC_KEY,
     process.env.PAYMENT_PRIVATE_KEY
@@ -41,14 +50,14 @@ const postOrdered = async (req, res, next) => {
 
   const html = liqpay.cnb_form({
     action: "pay",
-    //amount: req.body.total,
+    amount: req.body.total,
     amount: "0.1",
     currency: "UAH",
     description: "Оплата товарів",
     order_id: saved._id,
     version: "3",
     result_url: `http://localhost:3000/checkout/success/${saved._id}`,
-    // rro_info: { items: req.body.products },
+    rro_info: { items: req.body.products },
   });
 
   // liqpay.api(

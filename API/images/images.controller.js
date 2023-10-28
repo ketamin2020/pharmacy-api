@@ -1,7 +1,7 @@
 const imagesModel = require("./images.model");
 const pick = require("../../utils/pick.js");
 const getImages = async (req, res, next) => {
-  const filter = pick(req.query, ["first_name"]);
+  const filter = pick(req.query, ["morion", "id", "created_at", "updated_at"]);
   const options = pick(req.query, ["order", "sort_field", "per_page", "page"]);
 
   const data = await imagesModel.paginate(filter, options);

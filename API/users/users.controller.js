@@ -5,7 +5,16 @@ const jwt = require("jsonwebtoken");
 const pick = require("../../utils/pick");
 
 const getUsers = async (req, res, next) => {
-  const filter = pick(req.query, ["first_name"]);
+  const filter = pick(req.query, [
+    "first_name",
+    "last_name",
+    "middle_name",
+    "about",
+    "phone",
+    "email",
+    "created_at",
+    "updated_at",
+  ]);
   const options = pick(req.query, ["order", "sort_field", "per_page", "page"]);
 
   const users = await usersModel.paginate(filter, options);

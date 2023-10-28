@@ -2,7 +2,15 @@ const substancesModel = require("./substances.model");
 const pick = require("../../utils/pick.js");
 
 const getSubstances = async (req, res, next) => {
-  const filter = pick(req.query, ["first_name"]);
+  const filter = pick(req.query, [
+    "name_ua",
+    "name_eu",
+    "index",
+    "head_title",
+    "slug",
+    "created_at",
+    "updated_at",
+  ]);
   const options = pick(req.query, ["order", "sort_field", "per_page", "page"]);
 
   const data = await substancesModel.paginate(filter, options);
