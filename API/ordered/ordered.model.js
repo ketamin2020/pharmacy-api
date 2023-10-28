@@ -23,15 +23,30 @@ const PaymentTypeNum = {
 const StatusTypeNum = {
   ACTIVE: 1,
   INACTIVE: 2,
+  REFUSED: 3,
+};
+
+const PaymentStatus = {
+  UNPAID: 1,
+  FAILED: 2,
+  EXPIRED: 3,
+  PAID: 4,
+  REFUNDING: 5,
 };
 const orderedSchema = new Schema(
   {
     user_id: { type: ObjectId, required: true, unique: true },
     basket_id: { type: ObjectId, required: true, unique: true },
     delivery_type: {
-      type: Number,
-      required: true,
-      default: DeliveryTypeNum.PICKUP,
+      type: {
+        type: Number,
+        required: true,
+        default: DeliveryTypeNum.PICKUP,
+      },
+      title: {
+        type: String,
+        required: false,
+      },
     },
     status: { type: Number, required: true, default: StatusTypeNum.ACTIVE },
     status_history: { type: Array, required: false, default: [] },
@@ -54,6 +69,7 @@ const orderedSchema = new Schema(
     products: { type: Array, required: true, default: [] },
     payment: {
       type: { type: Number, required: true, default: PaymentTypeNum.IN_SHOP },
+      status: { type: Number, required: true, default: PaymentStatus.UNPAID },
       name: { type: String, required: false, default: 0 },
       price: {
         description: { type: String, required: false },
