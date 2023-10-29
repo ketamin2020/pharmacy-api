@@ -51,7 +51,7 @@ const {
 
 const messages = require("../service/message");
 
-// messages().api_get_auth();
+messages().api_get_auth();
 
 module.exports = class taskMgrServer {
   constructor() {
