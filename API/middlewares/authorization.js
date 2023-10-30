@@ -16,7 +16,7 @@ const withAuth = async (req, res, next) => {
     let user = null;
 
     if (userId) {
-      user = await userModel.findById(userPubId);
+      user = await userModel.findById(userId);
     } else {
       user = await userModelPub.findById(userPubId);
     }

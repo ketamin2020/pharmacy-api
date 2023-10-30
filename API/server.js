@@ -49,6 +49,10 @@ const {
   NotFoundError,
 } = require("../helpers/error.helpers");
 
+const messages = require("../service/message");
+
+messages().api_get_auth();
+
 module.exports = class taskMgrServer {
   constructor() {
     this.server = null;
