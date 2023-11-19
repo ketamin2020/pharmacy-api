@@ -1,17 +1,14 @@
 const reviewModel = require("./reviews.model");
 const usersModel = require("../users/users.model");
 const getReviews = async (req, res, next) => {
-  // const banners = await reviewModel.find({});
-  // const arr = banners.reduce((acc, item) => {
-  //   acc.push({
-  //     id: item._id,
-  //     link: item.link,
-  //     createdAt: item.createdAt,
-  //     link_id: item.id,
-  //   });
-  //   return acc;
-  // }, []);
-  // return res.status(200).send({ data: arr });
+  const filter = pick(req.query, ["name", "created_at", "updated_at"]);
+  const options = pick(req.query, ["order", "sort_field", "per_page", "page"]);
+
+  options.populate = "type";
+
+  const data = await reviewModel.paginate(filter, options);
+
+  return res.status(200).send({ data });
 };
 
 const getLastReviews = async (req, res, next) => {

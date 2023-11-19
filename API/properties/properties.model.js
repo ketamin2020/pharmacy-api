@@ -16,6 +16,8 @@ const propertiesSchema = new Schema(
     external_code: { type: String, required: false },
     name: { type: String, required: true, default: "Торгова назва" },
     views: { type: Number, default: 0 },
+    percent_type: { type: Number, default: 0 },
+    property_type: { type: Number, default: 0 },
     sold: { type: Number, default: 0 },
     attributes: {
       main: {

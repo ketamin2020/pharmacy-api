@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const slug = require("mongoose-slug-generator");
+const { paginate } = require("../../plugin/paginate");
+const { toJSON } = require("../../plugin/toJSON");
 mongoose.plugin(slug);
 const {
   Schema,
@@ -23,6 +25,9 @@ const reviewSchema = new Schema(
   },
   { timestamps: true }
 );
+
+reviewSchema.plugin(paginate);
+reviewSchema.plugin(toJSON);
 
 const reviewModel = mongoose.model("Review", reviewSchema);
 
