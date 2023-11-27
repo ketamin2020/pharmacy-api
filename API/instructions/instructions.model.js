@@ -15,6 +15,10 @@ const instructionsSchema = new Schema(
     external_code: { type: String, required: false },
     name: { type: String, required: true },
     section: {
+      description: {
+        title: { type: String, default: "Опис" },
+        html: { type: String },
+      },
       composition: {
         title: { type: String, default: "Склад" },
         html: { type: String },

@@ -48,7 +48,7 @@ user_router.put(
 user_router.delete(
   UserRoutes.DELETE,
   catchAsync(authHiddleware.withAuth),
-  validate(validation.updateUser),
+  validate(validation.deleteUser),
   catchAsync(userController.deleteUser)
 );
 

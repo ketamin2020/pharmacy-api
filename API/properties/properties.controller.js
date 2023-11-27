@@ -82,9 +82,33 @@ const deleteProperty = async (req, res, next) => {
   res.status(200).send({ message: "Substances was deleted successfuly!" });
 };
 
+const copyProperty = async (req, res, next) => {
+  try {
+    const originalObject = await propertiesModel.findById(req.query.id);
+
+    if (!originalObject) {
+      throw new Error("Object not found");
+    }
+
+    const cloneObject = new propertiesModel({
+      ...originalObject.toObject(),
+      _id: undefined,
+      createdAt: undefined,
+      updatedAt: undefined,
+    });
+
+    const savedClone = await cloneObject.save();
+
+    res.status(200).send({ data: savedClone });
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   getProperties,
   postProperty,
   putProperty,
   deleteProperty,
+  copyProperty,
 };

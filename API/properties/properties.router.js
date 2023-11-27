@@ -27,4 +27,10 @@ propertyRouter.delete(
   asyncWrapper(PropertiesControllers.deleteProperty)
 );
 
+propertyRouter.post(
+  "/copy",
+  asyncWrapper(authHiddleware.withAuth),
+  asyncWrapper(PropertiesControllers.copyProperty)
+);
+
 module.exports = propertyRouter;

@@ -31,7 +31,7 @@ const updateUser = async (req, res) => {
 };
 
 const deleteUser = async (req, res) => {
-  await userService.deleteUserById(req.params.userId);
+  await userService.deleteUserById(req.query.id);
   res.status(httpStatus.NO_CONTENT).send();
 };
 
