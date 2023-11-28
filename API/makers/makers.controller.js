@@ -13,7 +13,13 @@ const getMakers = async (req, res, next) => {
   ]);
   const options = pick(req.query, ["order", "sort_field", "per_page", "page"]);
 
-  const data = await makersModel.paginate(filter, options);
+  let data;
+
+  if (Object.keys(req.query).length > 0) {
+    data = await makersModel.paginate(filter, options);
+  } else {
+    data = await makersModel.find({});
+  }
   return res.status(200).send({ data });
 };
 const postMaker = async (req, res, next) => {

@@ -13,7 +13,13 @@ const getSubstances = async (req, res, next) => {
   ]);
   const options = pick(req.query, ["order", "sort_field", "per_page", "page"]);
 
-  const data = await substancesModel.paginate(filter, options);
+  let data;
+
+  if (Object.keys(req.query).length > 0) {
+    data = await substancesModel.paginate(filter, options);
+  } else {
+    data = await substancesModel.find({});
+  }
   return res.status(200).send({ data });
 };
 const postSubstance = async (req, res, next) => {
