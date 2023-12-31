@@ -5,13 +5,24 @@ const instructionModel = require("../instructions/instructions.model");
 const imagesModel = require("../images/images.model");
 const reviewModel = require("../reviews/reviews.model");
 const Novaposhta = require("../../service/novaposhta");
-
+const mongoose = require("mongoose");
 const api = new Novaposhta();
 
 const getDrugsList = async (req, res, next) => {
-  const { main_group, first_lavel, second_level } = req.query;
+  const {
+    main_group,
+    first_lavel,
+    second_level,
+    page = 1,
+    pageSize = 10,
+    ...params
+  } = req.query;
 
   const filters = {
+    "attributes.main.items.groups.main_group.slug": main_group,
+  };
+
+  const queryFilter = {
     "attributes.main.items.groups.main_group.slug": main_group,
   };
 
@@ -19,12 +30,21 @@ const getDrugsList = async (req, res, next) => {
     filters[
       "attributes.main.items.groups.first_lavel_group.slug"
     ] = first_lavel;
+    queryFilter[
+      "attributes.main.items.groups.first_lavel_group.slug"
+    ] = first_lavel;
   }
   if (second_level) {
     filters[
       "attributes.main.items.groups.second_lavel_group.slug"
     ] = second_level;
+
+    queryFilter[
+      "attributes.main.items.groups.second_lavel_group.slug"
+    ] = second_level;
   }
+
+  const skip = (page - 1) * pageSize;
 
   const filter = {
     slug: main_group,
@@ -42,9 +62,17 @@ const getDrugsList = async (req, res, next) => {
     .findOne(filter, first_lavel && { "children.$": 1 })
     .lean();
 
+  for (const key in params) {
+    if (Array.isArray(params[key]) && params[key].length > 0) {
+      queryFilter[`attributes.main.items.${key}.value`] = {
+        $in: params[key].map((id) => mongoose.Types.ObjectId(id)),
+      };
+    }
+  }
+
   const pipeline = [
     {
-      $match: filters,
+      $match: queryFilter,
     },
     {
       $lookup: {
@@ -78,19 +106,33 @@ const getDrugsList = async (req, res, next) => {
         as: "reviews",
       },
     },
-    // {
-    //   $unwind: "$reviews",
-    // },
 
     {
-      $unwind: "$price",
+      $unwind: {
+        path: "$reviews",
+        preserveNullAndEmptyArrays: true,
+      },
     },
 
     {
-      $unwind: "$images",
+      $unwind: {
+        path: "$price",
+        preserveNullAndEmptyArrays: true,
+      },
     },
+
     {
-      $unwind: "$marked_name",
+      $unwind: {
+        path: "$images",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+
+    {
+      $unwind: {
+        path: "$marked_name",
+        preserveNullAndEmptyArrays: true,
+      },
     },
 
     {
@@ -107,6 +149,8 @@ const getDrugsList = async (req, res, next) => {
       },
     },
   ];
+
+  pipeline.push({ $skip: skip }, { $limit: pageSize });
 
   const pipelineTradeName = [
     {
@@ -461,6 +505,10 @@ const getDrugsList = async (req, res, next) => {
   return res.status(200).send({
     data,
     group,
+    pagination: {
+      page: parseInt(page),
+      pageSize: parseInt(pageSize),
+    },
     properties: {
       trade_name,
       substances,
@@ -548,11 +596,9 @@ const getDrugById = async (req, res, next) => {
     })
     .select("name section");
 
-  const images = await imagesModel
-    .findOne({
-      morion: property.morion,
-    })
-    .select("items");
+  const images = await imagesModel.findOne({
+    morion: property.morion,
+  });
 
   const reviews = await reviewModel
     .find({
@@ -562,7 +608,7 @@ const getDrugById = async (req, res, next) => {
 
   const rating = reviews.reduce((acc, item) => (acc += +item.rate), 0);
 
-  const prepareImages = images.items.filter((item) => !!item.id);
+  const prepareImages = images?.items?.filter((item) => !!item.id);
 
   return res.status(200).send({
     property: {
