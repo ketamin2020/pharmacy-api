@@ -1,8 +1,8 @@
 const axios = require("axios");
 
 module.exports = function MessagingCenter() {
-  this.host = "https://cpa3.kyivstar.ua/api/contents/sms";
-  this.auth_host = "https://cpa3.kyivstar.ua/api/contents";
+  this.host = "https://cpa3.kyivstar.ua/api/contents/";
+  this.auth_host = "https://api-gateway.kyivstar.ua/idp/oauth2/token";
   this.source = "ARTMED";
   this.serviceType = "104";
   this.bearerType = "sms";
@@ -10,7 +10,9 @@ module.exports = function MessagingCenter() {
 
   this.auth_crendential =
     "Basic " +
-    Buffer.from(`${"ARTMED"}:${"VZ4TqupxSbRvxLwt"}`).toString("base64");
+    Buffer.from(
+      `${process.env.KYIVSTAR_CLIENT_ID}:${process.env.KYIVSTAR_CLIENT_SECRET}`
+    ).toString("base64");
 
   this.template = function (params) {
     const message = {
@@ -32,6 +34,7 @@ module.exports = function MessagingCenter() {
       headers: {
         Authorization: this.auth_crendential,
       },
+      data: "grant_type=client_credentials",
     };
 
     axios(config)
