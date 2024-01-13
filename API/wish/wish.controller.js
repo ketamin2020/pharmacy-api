@@ -45,7 +45,10 @@ const getWishListByUser = async (req, res, next) => {
       },
     },
     {
-      $unwind: "$price",
+      $unwind: {
+        path: "$price",
+        preserveNullAndEmptyArrays: true,
+      },
     },
     {
       $lookup: {
@@ -56,7 +59,10 @@ const getWishListByUser = async (req, res, next) => {
       },
     },
     {
-      $unwind: "$images",
+      $unwind: {
+        path: "$images",
+        preserveNullAndEmptyArrays: true,
+      },
     },
     {
       $lookup: {
@@ -67,12 +73,19 @@ const getWishListByUser = async (req, res, next) => {
       },
     },
     {
-      $unwind: "$reviews",
+      $unwind: {
+        path: "$reviews",
+        preserveNullAndEmptyArrays: true,
+      },
     },
     {
-      $match: { "price._id": { $exists: true } },
+      $match: {
+        $or: [
+          { "price._id": { $exists: true } },
+          { "price._id": null }, // Добавляем условие для случаев, когда _id в price отсутствует
+        ],
+      },
     },
-
     {
       $group: {
         _id: "$_id",

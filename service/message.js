@@ -1,15 +1,12 @@
 const axios = require("axios");
 
 module.exports = function MessagingCenter() {
-  // this.host = "https://cpa3.kyivstar.ua/api/contents/sms";
-  this.host = "https://api-gateway.kyivstar.ua/mock/rest/v1beta/sms";
-  this.auth_host = "https://api-gateway.kyivstar.ua/idp/oauth2/token";
+  this.host = "https://cpa3.kyivstar.ua/api/contents/sms";
+  this.auth_host = "https://cpa3.kyivstar.ua/api/contents";
   this.source = "ARTMED";
   this.serviceType = "104";
   this.bearerType = "sms";
   this.contentType = "text/plain";
-  this.token =
-    "ASYyFcu54Qh5yS3SaZNgw9UPKPYDS2fJnznLd4RphWs.T2V7HLCMvbCpjCYSopmq-HokFRCxHKfiag4daUfpO8s";
 
   this.auth_crendential =
     "Basic " +
@@ -19,15 +16,12 @@ module.exports = function MessagingCenter() {
 
   this.template = function (params) {
     const message = {
-      from: "ARTMED",
-      to: "380985369386",
-      text: "Hello World!",
-      // source: this.source,
-      // destination: params.destination,
-      // serviceType: this.serviceType,
-      // bearerType: this.bearerType,
-      // contentType: this.contentType,
-      // content: params.content,
+      source: this.source,
+      destination: "380985369386",
+      serviceType: this.serviceType,
+      bearerType: this.bearerType,
+      contentType: this.contentType,
+      content: "Hello from ARTMED",
     };
 
     return message;
@@ -37,16 +31,16 @@ module.exports = function MessagingCenter() {
     const config = {
       method: "post",
       url: this.auth_host,
-
       headers: {
         Authorization: this.auth_crendential,
       },
-      data: "grant_type=client_credentials",
     };
 
     axios(config)
-      .then((data) => data)
-      .then(() => this.api_send_message({}))
+      .then((data) => {
+        console.log(data, "data");
+        this.api_send_message(data.data);
+      })
       .catch((error) => console.log(error));
   };
 
@@ -54,11 +48,10 @@ module.exports = function MessagingCenter() {
     const data = this.template(params);
 
     const headers = {
-      Authorization: `Bearer ${this.token}`,
+      Authorization: `Bearer ${params.access_token}`,
       "Content-Type": "application/json",
     };
 
-    console.log(data, "data");
     try {
       const response = await axios.post(this.host, data, { headers });
 

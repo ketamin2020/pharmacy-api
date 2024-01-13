@@ -15,8 +15,6 @@ function formatArray(inputArray, additionalInfo) {
     for (const key in additionalInfo) {
       const targetKey = additionalInfo[key];
 
-      console.log(item, additionalInfo);
-
       if (item[targetKey] !== undefined) {
         formattedItem[key] = +item[targetKey];
       }

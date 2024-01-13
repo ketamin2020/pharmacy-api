@@ -20,4 +20,14 @@ publicRouter.get(
   asyncWrapper(publicControllers.searchByWerehouse)
 );
 
+publicRouter.get(
+  "/drugs-by-active-substance",
+  asyncWrapper(publicControllers.getDrugByActiveIngridient)
+);
+
+publicRouter.get(
+  "/drugs-by-views",
+  asyncWrapper(publicControllers.getDrugsByViews)
+);
+
 module.exports = publicRouter;

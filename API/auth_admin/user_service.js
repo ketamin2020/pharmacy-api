@@ -23,8 +23,6 @@ const getUserById = async (id) => {
 };
 
 const getUserByEmail = async (email) => {
-  const u = await User.find({});
-  console.log(u, "users");
   return await User.findOne({ email });
 };
 

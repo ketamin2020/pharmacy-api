@@ -583,8 +583,6 @@ const getDrugById = async (req, res, next) => {
     })
     .select("attributes external_code morion name _id updatedAt ");
 
-  // await property.addView();
-
   const price = await priceModel
     .findOne({ morion: property.morion })
     .populate("partner")
@@ -609,6 +607,8 @@ const getDrugById = async (req, res, next) => {
   const rating = reviews.reduce((acc, item) => (acc += +item.rate), 0);
 
   const prepareImages = images?.items?.filter((item) => !!item.id);
+
+  await property.addView();
 
   return res.status(200).send({
     property: {
@@ -679,10 +679,215 @@ const searchByWerehouse = async (req, res, next) => {
   }
 };
 
+const getDrugByActiveIngridient = async (req, res, next) => {
+  try {
+    const activeIngredientId = req.query.active_ingredient;
+
+    if (!activeIngredientId) {
+      return res
+        .status(400)
+        .json({ error: "Параметр active_ingredient не был предоставлен." });
+    }
+
+    const pipeline = [
+      {
+        $match: {
+          "attributes.main.items.active_ingredient.value": mongoose.Types.ObjectId(
+            activeIngredientId
+          ),
+        },
+      },
+      {
+        $lookup: {
+          from: "prices",
+          let: { morion: "$morion" },
+          pipeline: [{ $match: { $expr: { $eq: ["$morion", "$$morion"] } } }],
+          as: "price",
+        },
+      },
+      {
+        $lookup: {
+          from: "tradenames",
+          let: { name: "$attributes.main.items.marked_name.value" },
+          pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$name"] } } }],
+          as: "marked_name",
+        },
+      },
+      {
+        $lookup: {
+          from: "images",
+          let: { morion: "$morion" },
+          pipeline: [{ $match: { $expr: { $eq: ["$morion", "$$morion"] } } }],
+          as: "images",
+        },
+      },
+      {
+        $lookup: {
+          from: "reviews",
+          let: { morion: "$morion" },
+          pipeline: [{ $match: { $expr: { $eq: ["$morion", "$$morion"] } } }],
+          as: "reviews",
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$reviews",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$price",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$images",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$marked_name",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      {
+        $project: {
+          morion: "$morion",
+          name: "$name",
+          slug: "$slug",
+          price: { $ifNull: ["$price", null] },
+          images: { $ifNull: ["$images", null] },
+          marked_name: { $ifNull: ["$marked_name", null] },
+
+          external_code: "$external_code",
+          reviews: { $ifNull: ["$reviews", null] },
+          id: { $toString: "$_id" },
+        },
+      },
+
+      { $limit: 20 },
+    ];
+
+    const data = await propertyModel.aggregate(pipeline).exec();
+
+    res.status(200).json(data);
+  } catch (error) {
+    console.error("Ошибка при поиске препаратов:", error);
+    res.status(500).json({ error: "Произошла ошибка на сервере." });
+  }
+};
+
+const getDrugsByViews = async (req, res, next) => {
+  try {
+    const pipeline = [
+      {
+        $lookup: {
+          from: "prices",
+          let: { morion: "$morion" },
+          pipeline: [{ $match: { $expr: { $eq: ["$morion", "$$morion"] } } }],
+          as: "price",
+        },
+      },
+      {
+        $lookup: {
+          from: "tradenames",
+          let: { name: "$attributes.main.items.marked_name.value" },
+          pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$name"] } } }],
+          as: "marked_name",
+        },
+      },
+      {
+        $lookup: {
+          from: "images",
+          let: { morion: "$morion" },
+          pipeline: [{ $match: { $expr: { $eq: ["$morion", "$$morion"] } } }],
+          as: "images",
+        },
+      },
+      {
+        $lookup: {
+          from: "reviews",
+          let: { morion: "$morion" },
+          pipeline: [{ $match: { $expr: { $eq: ["$morion", "$$morion"] } } }],
+          as: "reviews",
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$reviews",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$price",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$images",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$marked_name",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      {
+        $project: {
+          morion: "$morion",
+          name: "$name",
+          slug: "$slug",
+          price: { $ifNull: ["$price", null] },
+          images: { $ifNull: ["$images", null] },
+          marked_name: { $ifNull: ["$marked_name", null] },
+
+          external_code: "$external_code",
+          reviews: { $ifNull: ["$reviews", null] },
+          id: { $toString: "$_id" },
+        },
+      },
+
+      {
+        $sort: {
+          views: -1,
+        },
+      },
+
+      { $limit: 20 },
+    ];
+
+    const data = await propertyModel.aggregate(pipeline).exec();
+
+    res.status(200).json(data);
+  } catch (error) {
+    console.error("Ошибка при поиске препаратов:", error);
+    res.status(500).json({ error: "Произошла ошибка на сервере." });
+  }
+};
+
 module.exports = {
   getDrugsList,
   getDrugById,
   getMedicinesGroupList,
   searchByCityName,
   searchByWerehouse,
+  getDrugByActiveIngridient,
+  getDrugsByViews,
 };

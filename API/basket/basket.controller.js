@@ -42,7 +42,21 @@ const getBasketListByUser = async (req, res, next) => {
       },
     },
     {
-      $unwind: "$price",
+      $addFields: {
+        price: {
+          $cond: {
+            if: { $gt: [{ $size: "$price" }, 0] },
+            then: { $arrayElemAt: ["$price", 0] },
+            else: null,
+          },
+        },
+      },
+    },
+    {
+      $unwind: {
+        path: "$price",
+        preserveNullAndEmptyArrays: true,
+      },
     },
     {
       $lookup: {
@@ -53,7 +67,21 @@ const getBasketListByUser = async (req, res, next) => {
       },
     },
     {
-      $unwind: "$images",
+      $addFields: {
+        images: {
+          $cond: {
+            if: { $gt: [{ $size: "$images" }, 0] },
+            then: { $arrayElemAt: ["$images", 0] },
+            else: null,
+          },
+        },
+      },
+    },
+    {
+      $unwind: {
+        path: "$images",
+        preserveNullAndEmptyArrays: true,
+      },
     },
     {
       $lookup: {
@@ -64,10 +92,33 @@ const getBasketListByUser = async (req, res, next) => {
       },
     },
     {
-      $unwind: "$reviews",
+      $addFields: {
+        reviews: {
+          $cond: {
+            if: { $gt: [{ $size: "$reviews" }, 0] },
+            then: { $arrayElemAt: ["$reviews", 0] },
+            else: null,
+          },
+        },
+      },
     },
     {
-      $match: { "price._id": { $exists: true } },
+      $unwind: {
+        path: "$reviews",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    // {
+    //   $match: { "price._id": { $exists: true } },
+    // },
+
+    {
+      $match: {
+        $or: [
+          { "price._id": { $exists: true } },
+          { "price._id": null }, // Добавляем условие для случаев, когда _id в price отсутствует
+        ],
+      },
     },
     {
       $group: {
@@ -83,7 +134,6 @@ const getBasketListByUser = async (req, res, next) => {
             qty: "$products.qty",
           },
         },
-
         created_at: { $first: "$createdAt" },
         updated_at: { $first: "$updatedAt" },
       },
@@ -133,7 +183,6 @@ const getBasketListByUser = async (req, res, next) => {
             },
           },
         },
-
         created_at: 1,
         updated_at: 1,
         id: "$_id",
