@@ -1,8 +1,9 @@
 const axios = require("axios");
 
 module.exports = function MessagingCenter() {
-  this.host = "https://cpa3.kyivstar.ua/api/contents/";
+  this.host = "https://cpa3.kyivstar.ua/api/contents";
   this.auth_host = "https://api-gateway.kyivstar.ua/idp/oauth2/token";
+  // this.auth_host = "https://cpa3.kyivstar.ua/idp/oauth2/token";
   this.source = "ARTMED";
   this.serviceType = "104";
   this.bearerType = "sms";
@@ -36,7 +37,7 @@ module.exports = function MessagingCenter() {
       },
       data: "grant_type=client_credentials",
     };
-
+    console.log(config, "config");
     axios(config)
       .then((data) => {
         console.log(data, "data");
