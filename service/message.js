@@ -10,9 +10,7 @@ module.exports = function MessagingCenter() {
 
   this.auth_crendential =
     "Basic " +
-    Buffer.from(
-      `${process.env.KYIVSTAR_CLIENT_ID}:${process.env.KYIVSTAR_CLIENT_SECRET}`
-    ).toString("base64");
+    Buffer.from(`${"ARTMED"}:${"VZ4TqupxSbRvxLwt"}`).toString("base64");
 
   this.template = function (params) {
     const message = {
