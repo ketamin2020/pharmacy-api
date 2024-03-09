@@ -20,6 +20,8 @@ publicRouter.get(
   asyncWrapper(publicControllers.searchByWerehouse)
 );
 
+publicRouter.get("/search", asyncWrapper(publicControllers.searchByName));
+
 publicRouter.get(
   "/drugs-by-active-substance",
   asyncWrapper(publicControllers.getDrugByActiveIngridient)
@@ -28,6 +30,11 @@ publicRouter.get(
 publicRouter.get(
   "/drugs-by-views",
   asyncWrapper(publicControllers.getDrugsByViews)
+);
+
+publicRouter.get(
+  "/drugs-by-sold",
+  asyncWrapper(publicControllers.getDrugsBySold)
 );
 
 module.exports = publicRouter;

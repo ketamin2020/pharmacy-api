@@ -23,8 +23,7 @@ reviewRouter.get(
 );
 reviewRouter.post(
   "/create",
-  asyncWrapper(authHiddleware.withAuth),
-  asyncWrapper(authHiddleware.withAuth),
+
   asyncWrapper(reviewsControllers.postReview)
 );
 reviewRouter.delete(

@@ -1,10 +1,12 @@
 const reviewModel = require("./reviews.model");
 const usersModel = require("../users/users.model");
+const pick = require("../../utils/pick.js");
+
 const getReviews = async (req, res, next) => {
   const filter = pick(req.query, ["name", "created_at", "updated_at"]);
   const options = pick(req.query, ["order", "sort_field", "per_page", "page"]);
 
-  options.populate = "type";
+  options.populate = "property";
 
   const data = await reviewModel.paginate(filter, options);
 

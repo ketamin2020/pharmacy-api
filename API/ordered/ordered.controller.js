@@ -72,7 +72,7 @@ const postOrdered = async (req, res, next) => {
   //   }
   // );
 
-  return res.status(200).json({ data: html });
+  return res.status(200).json({ data: html, order: saved });
 };
 const putOrdered = (req, res, next) => {};
 

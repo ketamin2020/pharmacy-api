@@ -141,13 +141,22 @@ const propertiesSchema = new Schema(
   },
   { timestamps: true }
 );
-propertiesSchema.methods.addView = function () {
-  this.views = this.views += 1;
-  return this.save();
+propertiesSchema.methods.addView = async function () {
+  if (!this.views) {
+    this.views = 1;
+  } else {
+    this.views += 1;
+  }
+
+  return await this.save();
 };
-propertiesSchema.methods.addSold = function () {
-  this.sold = this.sold += 1;
-  return this.save();
+propertiesSchema.methods.addSold = async function () {
+  if (!this.sold) {
+    this.sold = 1;
+  } else {
+    this.sold += 1;
+  }
+  return await this.save();
 };
 propertiesSchema.plugin(paginate);
 propertiesSchema.plugin(toJSON);

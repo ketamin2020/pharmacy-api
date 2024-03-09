@@ -581,7 +581,7 @@ const getDrugById = async (req, res, next) => {
       path: "attributes.main.items.production_form.value",
       model: "Form",
     })
-    .select("attributes external_code morion name _id updatedAt ");
+    .select("attributes external_code morion name _id updatedAt views sold ");
 
   const price = await priceModel
     .findOne({ morion: property.morion })
@@ -676,6 +676,83 @@ const searchByWerehouse = async (req, res, next) => {
     );
   } catch (error) {
     return res.status(500).send(error);
+  }
+};
+const searchByName = async (req, res, next) => {
+  try {
+    const search = req.query.search;
+
+    const regex = new RegExp(search, "i");
+
+    const pipeline = [
+      {
+        $match: {
+          name: { $regex: regex },
+        },
+      },
+      {
+        $lookup: {
+          from: "prices",
+          let: { morion: "$morion" },
+          pipeline: [{ $match: { $expr: { $eq: ["$morion", "$$morion"] } } }],
+          as: "price",
+        },
+      },
+
+      {
+        $lookup: {
+          from: "images",
+          let: { morion: "$morion" },
+          pipeline: [{ $match: { $expr: { $eq: ["$morion", "$$morion"] } } }],
+          as: "images",
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$price",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$images",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      {
+        $project: {
+          morion: "$morion",
+          name: "$name",
+          slug: "$slug",
+          price: { $ifNull: ["$price", null] },
+          images: { $ifNull: ["$images", null] },
+          external_code: "$external_code",
+          id: { $toString: "$_id" },
+        },
+      },
+
+      { $limit: 10 },
+    ];
+
+    const data = await propertyModel.aggregate(pipeline).exec();
+
+    const prepareData = data.map((item) => ({
+      external_code: item.external_code,
+      id: item.id,
+      morion: item.morion,
+      price: item.price,
+      slug: item.slug,
+      image: item?.images?.items?.[0],
+      name: item.name,
+    }));
+
+    res.status(200).json(prepareData);
+  } catch (error) {
+    console.error("Ошибка при поиске препаратов:", error);
+    res.status(500).json({ error: "Произошла ошибка на сервере." });
   }
 };
 
@@ -789,6 +866,13 @@ const getDrugsByViews = async (req, res, next) => {
   try {
     const pipeline = [
       {
+        $sort: {
+          views: -1,
+        },
+      },
+
+      { $limit: 20 },
+      {
         $lookup: {
           from: "prices",
           let: { morion: "$morion" },
@@ -863,14 +947,101 @@ const getDrugsByViews = async (req, res, next) => {
           id: { $toString: "$_id" },
         },
       },
+    ];
 
+    const data = await propertyModel.aggregate(pipeline).exec();
+
+    res.status(200).json(data);
+  } catch (error) {
+    console.error("Ошибка при поиске препаратов:", error);
+    res.status(500).json({ error: "Произошла ошибка на сервере." });
+  }
+};
+const getDrugsBySold = async (req, res, next) => {
+  try {
+    const pipeline = [
       {
         $sort: {
-          views: -1,
+          sold: -1,
         },
       },
 
       { $limit: 20 },
+      {
+        $lookup: {
+          from: "prices",
+          let: { morion: "$morion" },
+          pipeline: [{ $match: { $expr: { $eq: ["$morion", "$$morion"] } } }],
+          as: "price",
+        },
+      },
+      {
+        $lookup: {
+          from: "tradenames",
+          let: { name: "$attributes.main.items.marked_name.value" },
+          pipeline: [{ $match: { $expr: { $eq: ["$_id", "$$name"] } } }],
+          as: "marked_name",
+        },
+      },
+      {
+        $lookup: {
+          from: "images",
+          let: { morion: "$morion" },
+          pipeline: [{ $match: { $expr: { $eq: ["$morion", "$$morion"] } } }],
+          as: "images",
+        },
+      },
+      {
+        $lookup: {
+          from: "reviews",
+          let: { morion: "$morion" },
+          pipeline: [{ $match: { $expr: { $eq: ["$morion", "$$morion"] } } }],
+          as: "reviews",
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$reviews",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$price",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$images",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      {
+        $unwind: {
+          path: "$marked_name",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+
+      {
+        $project: {
+          morion: "$morion",
+          name: "$name",
+          slug: "$slug",
+          price: { $ifNull: ["$price", null] },
+          images: { $ifNull: ["$images", null] },
+          marked_name: { $ifNull: ["$marked_name", null] },
+
+          external_code: "$external_code",
+          reviews: { $ifNull: ["$reviews", null] },
+          id: { $toString: "$_id" },
+        },
+      },
     ];
 
     const data = await propertyModel.aggregate(pipeline).exec();
@@ -890,4 +1061,6 @@ module.exports = {
   searchByWerehouse,
   getDrugByActiveIngridient,
   getDrugsByViews,
+  getDrugsBySold,
+  searchByName,
 };

@@ -180,12 +180,12 @@ const getDrugById = async (req, res, next) => {
     })
     .select("items ");
 
-  const reviews = await reviewModel
-    .find({
-      property: req.query.id,
-    })
-    .select("rate");
-  const rating = reviews.reduce((acc, item) => (acc += +item.rate), 0);
+  // const reviews = await reviewModel
+  //   .find({
+  //     property: req.query.id,
+  //   })
+  //   .select("rate");
+  // const rating = reviews.reduce((acc, item) => (acc += +item.rate), 0);
 
   const prepareImages = images.items.filter((item) => !!item.id);
 
@@ -202,10 +202,10 @@ const getDrugById = async (req, res, next) => {
     morion: property.morion,
     name: property.name,
     external_code: property.external_code,
-    reviews: {
-      count: reviews.length,
-      rating: (rating / reviews.length).toFixed(1),
-    },
+    // reviews: {
+    //   count: reviews.length,
+    //   rating: (rating / reviews.length).toFixed(1),
+    // },
   });
 };
 

@@ -17,17 +17,17 @@ drugsRouter.get(
 );
 drugsRouter.get(
   "/drug",
-  asyncWrapper(authMiddleware.withAuth),
+  // asyncWrapper(authMiddleware.withAuth),
   asyncWrapper(publicControllers.getDrugById)
 );
 drugsRouter.get(
   "/search-address",
-  asyncWrapper(authMiddleware.withAuth),
+  // asyncWrapper(authMiddleware.withAuth),
   asyncWrapper(publicControllers.searchByCityName)
 );
 drugsRouter.get(
   "/search-werehouse",
-  asyncWrapper(authMiddleware.withAuth),
+  // asyncWrapper(authMiddleware.withAuth),
   asyncWrapper(publicControllers.searchByWerehouse)
 );
 
